@@ -1,131 +1,97 @@
 #include "window.h"
 
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <Windows.h>
+
+namespace
+{
 
 constexpr const char* class_name = "OpenGL";
-static Window* window = nullptr;
+Window::Impl* win = nullptr;
 
-Window* Window::create_once(
-  const char* title, int width, int height, uint8_t bits, bool is_fullscreen)
+/**
+ * @brief Make a pixel format descriptor for a window
+ * @return PIXELFORMATDESCRIPTOR
+ */
+constexpr PIXELFORMATDESCRIPTOR make_pfd();
+
+/**
+ * @brief Window message handler
+ * @param wnd Window handle
+ * @param msg Message to handle
+ * @param wparam Message info
+ * @param lparam Message info
+ * @return LRESULT Result of operation
+ */
+LRESULT CALLBACK wndproc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+} // namespace
+
+struct Window::Impl
 {
-  if (!window)
-  {
-    window = new Window;
-    if (!window->create(title, width, height, bits, is_fullscreen))
-    {
-      delete window;
-      window = nullptr;
-    }
-  }
-  return window;
+  /**
+   * @brief Construct a new object
+   * @param awidth Window width
+   * @param aheight Window height
+   */
+  Impl(int32_t awidth, int32_t aheight);
+
+  /**
+   * @brief Destroy the object
+   */
+  ~Impl();
+
+  /**
+   * @brief Create the window
+   * @param title Window title
+   * @param bits Color bits 16/24/32
+   * @return bool Result of operation
+   */
+  bool create(const char* title, uint8_t bits);
+
+  /**
+   * @brief Release window and resources
+   */
+  void release();
+
+  // Minimized to taskbar
+  bool is_minimized = false;
+  // Window in fullscreen
+  bool is_fullscreen = false;
+  // window width
+  int32_t width = 800;
+  // window height
+  int32_t height = 600;
+
+  // Permanent rendering context
+  HGLRC rc = nullptr;
+  // Private GDI device context
+  HDC dc = nullptr;
+  // Window handle
+  HWND wnd = nullptr;
+  // Application instance
+  HINSTANCE inst = nullptr;
+  // Pixel format
+  PIXELFORMATDESCRIPTOR pfd = make_pfd();
+  // Window placement
+  WINDOWPLACEMENT placement = {sizeof(placement)};
+};
+
+
+
+inline Window::Impl::Impl(int32_t awidth, int32_t aheight) : width{awidth}, height{aheight}
+{
 }
 
 
 
-LRESULT CALLBACK Window::wndproc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
+inline Window::Impl::~Impl()
 {
-  if (!window)
-  {
-    return 0;
-  }
-
-  bool is_handled = true;
-  switch (msg)
-  {
-    case WM_ACTIVATE:
-      window->m_is_minimized = HIWORD(wparam);
-      break;
-
-    case WM_SYSCOMMAND:
-      is_handled = SC_SCREENSAVE == wparam || SC_MONITORPOWER == wparam;
-      break;
-
-    case WM_CLOSE:
-      PostQuitMessage(0);
-      break;
-
-    case WM_KEYDOWN:
-      // todo
-      break;
-
-    case WM_KEYUP:
-      // todo
-      break;
-
-    case WM_SIZE:
-      window->resize(LOWORD(lparam), HIWORD(lparam));
-      break;
-
-    default:
-      is_handled = false;
-      break;
-  }
-
-  return is_handled ? 0 : DefWindowProc(wnd, msg, wparam, lparam);
+  release();
 }
 
 
 
-Window::~Window()
-{
-  if (m_rc)
-  {
-    wglMakeCurrent(nullptr, nullptr);
-    wglDeleteContext(m_rc);
-  }
-
-  if (m_dc)
-  {
-    ReleaseDC(m_wnd, m_dc);
-  }
-
-  if (m_wnd)
-  {
-    DestroyWindow(m_wnd);
-  }
-
-  if (m_inst)
-  {
-    UnregisterClass(class_name, m_inst);
-  }
-
-  window = nullptr;
-}
-
-
-
-void Window::resize(int width, int height)
-{
-  glViewport(0, 0, width, height > 0 ? height : 1);
-
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(45, static_cast<double>(width) / height, 0.1, 100);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-}
-
-
-
-void Window::draw()
-{
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-  SwapBuffers(m_dc);
-}
-
-
-
-bool Window::is_minimized() const
-{
-  return m_is_minimized;
-}
-
-
-
-bool Window::create(const char* title, int width, int height, uint8_t bits, bool is_fullscreen)
+bool Window::Impl::create(const char* title, uint8_t bits)
 {
   uint32_t pixel_format = 0;
   WNDCLASS wc;
@@ -133,14 +99,13 @@ bool Window::create(const char* title, int width, int height, uint8_t bits, bool
   DWORD style = WS_OVERLAPPEDWINDOW;
 
   RECT rect{.left = 0, .top = 0, .right = width, .bottom = height};
-  m_is_fullscreen = is_fullscreen;
 
-  m_inst = GetModuleHandle(nullptr);
+  inst = GetModuleHandle(nullptr);
   wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
   wc.lpfnWndProc = wndproc;
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
-  wc.hInstance = m_inst;
+  wc.hInstance = inst;
   wc.hIcon = LoadIcon(nullptr, IDI_WINLOGO);
   wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
   wc.hbrBackground = nullptr;
@@ -152,31 +117,9 @@ bool Window::create(const char* title, int width, int height, uint8_t bits, bool
     return false;
   }
 
-  if (m_is_fullscreen)
-  {
-    DEVMODE screen_settings;
-    memset(&screen_settings, 0, sizeof(screen_settings));
-    screen_settings.dmSize = sizeof(screen_settings);
-    screen_settings.dmPelsWidth = width;
-    screen_settings.dmPelsHeight = height;
-    screen_settings.dmBitsPerPel = bits;
-    screen_settings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+  AdjustWindowRectEx(&rect, style, FALSE, ex_style);
 
-    if (ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-    {
-      return false;
-    }
-
-    ex_style = WS_EX_APPWINDOW;
-    style = WS_POPUP;
-    ShowCursor(FALSE);
-  }
-  else
-  {
-    AdjustWindowRectEx(&rect, style, FALSE, ex_style);
-  }
-
-  m_wnd = CreateWindowEx(ex_style,
+  wnd = CreateWindowEx(ex_style,
     class_name,
     title,
     WS_CLIPSIBLINGS | WS_CLIPCHILDREN | style,
@@ -186,19 +129,197 @@ bool Window::create(const char* title, int width, int height, uint8_t bits, bool
     rect.bottom - rect.top,
     nullptr,
     nullptr,
-    m_inst,
+    inst,
     nullptr);
 
-  if (!m_wnd)
+  if (!wnd)
   {
     return false;
   }
 
-  static PIXELFORMATDESCRIPTOR pfd{.nSize = sizeof(PIXELFORMATDESCRIPTOR),
+  dc = GetDC(wnd);
+  if (!dc)
+  {
+    return false;
+  }
+
+  pfd.cColorBits = bits;
+  pixel_format = ChoosePixelFormat(dc, &pfd);
+  if (0 == pixel_format)
+  {
+    return false;
+  }
+
+  if (!SetPixelFormat(dc, pixel_format, &pfd))
+  {
+    return false;
+  }
+
+  rc = wglCreateContext(dc);
+  if (!rc)
+  {
+    return false;
+  }
+
+  if (!wglMakeCurrent(dc, rc))
+  {
+    return false;
+  }
+
+  ShowWindow(wnd, SW_SHOW);
+  SetForegroundWindow(wnd);
+  SetFocus(wnd);
+
+  return true;
+}
+
+
+
+void Window::Impl::release()
+{
+  if (rc)
+  {
+    wglMakeCurrent(nullptr, nullptr);
+    wglDeleteContext(rc);
+    rc = nullptr;
+  }
+
+  if (dc)
+  {
+    ReleaseDC(wnd, dc);
+    dc = nullptr;
+  }
+
+  if (wnd)
+  {
+    DestroyWindow(wnd);
+    wnd = nullptr;
+  }
+
+  if (inst)
+  {
+    UnregisterClass(class_name, inst);
+    inst = nullptr;
+  }
+
+  if (this == win)
+  {
+    win = nullptr;
+  }
+}
+
+
+
+Window::Window(const char* title, int32_t width, int32_t height, uint8_t bits)
+  : mimpl(std::make_unique<Window::Impl>(width, height))
+{
+  if (mimpl->create(title, bits))
+  {
+    win = mimpl.get();
+  }
+  else
+  {
+    mimpl->release();
+  }
+}
+
+
+
+Window::~Window() = default;
+
+
+
+void Window::swap_buffers() const
+{
+  SwapBuffers(mimpl->dc);
+}
+
+
+
+void Window::switch_fullscreen()
+{
+  if (mimpl->is_fullscreen)
+  {
+    set_windowed();
+  }
+  else
+  {
+    set_fullscreen();
+  }
+}
+
+
+
+void Window::set_fullscreen()
+{
+  DWORD style = GetWindowLong(mimpl->wnd, GWL_STYLE);
+  if (style & WS_OVERLAPPEDWINDOW)
+  {
+    MONITORINFO info = {sizeof(info)};
+    if (GetWindowPlacement(mimpl->wnd, &mimpl->placement)
+        && GetMonitorInfo(MonitorFromWindow(mimpl->wnd, MONITOR_DEFAULTTOPRIMARY), &info))
+    {
+      SetWindowLong(mimpl->wnd, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW);
+      SetWindowPos(mimpl->wnd,
+        HWND_TOP,
+        info.rcMonitor.left,
+        info.rcMonitor.top,
+        info.rcMonitor.right - info.rcMonitor.left,
+        info.rcMonitor.bottom - info.rcMonitor.top,
+        SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+      ShowCursor(FALSE);
+      mimpl->is_fullscreen = true;
+    }
+  }
+}
+
+
+
+void Window::set_windowed()
+{
+  DWORD style = GetWindowLong(mimpl->wnd, GWL_STYLE);
+  if (!(style & WS_OVERLAPPEDWINDOW))
+  {
+    SetWindowLong(mimpl->wnd, GWL_STYLE, style | WS_OVERLAPPEDWINDOW);
+    SetWindowPlacement(mimpl->wnd, &mimpl->placement);
+    SetWindowPos(mimpl->wnd,
+      nullptr,
+      0,
+      0,
+      0,
+      0,
+      SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+    ShowCursor(TRUE);
+    mimpl->is_fullscreen = false;
+  }
+}
+
+
+
+bool Window::is_minimized() const
+{
+  return mimpl->is_minimized;
+}
+
+
+
+bool Window::is_valid() const
+{
+  return mimpl.get() == win;
+}
+
+
+
+namespace
+{
+
+constexpr PIXELFORMATDESCRIPTOR make_pfd()
+{
+  return {.nSize = sizeof(PIXELFORMATDESCRIPTOR),
     .nVersion = 1,
     .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
     .iPixelType = PFD_TYPE_RGBA,
-    .cColorBits = bits,
+    .cColorBits = 0,
     .cRedBits = 0,
     .cRedShift = 0,
     .cGreenBits = 0,
@@ -220,52 +341,38 @@ bool Window::create(const char* title, int width, int height, uint8_t bits, bool
     .dwLayerMask = 0,
     .dwVisibleMask = 0,
     .dwDamageMask = 0};
-
-  m_dc = GetDC(m_wnd);
-  if (!m_dc)
-  {
-    return false;
-  }
-
-  pixel_format = ChoosePixelFormat(m_dc, &pfd);
-  if (0 == pixel_format)
-  {
-    return false;
-  }
-
-  if (!SetPixelFormat(m_dc, pixel_format, &pfd))
-  {
-    return false;
-  }
-
-  m_rc = wglCreateContext(m_dc);
-  if (!m_rc)
-  {
-    return false;
-  }
-
-  if (!wglMakeCurrent(m_dc, m_rc))
-  {
-    return false;
-  }
-
-  ShowWindow(m_wnd, SW_SHOW);
-  SetForegroundWindow(m_wnd);
-  SetFocus(m_wnd);
-  resize(width, height);
-
-  return init();
 }
 
 
 
-bool Window::init()
+LRESULT CALLBACK wndproc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-  glShadeModel(GL_SMOOTH);
-  glClearColor(0, 0, 0, 0);
-  glClearDepth(1);
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_EQUAL);
-  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-  return true;
+  if (!win)
+  {
+    return DefWindowProc(wnd, msg, wparam, lparam);
+  }
+
+  bool is_handled = true;
+  switch (msg)
+  {
+    case WM_ACTIVATE:
+      win->is_minimized = HIWORD(wparam);
+      break;
+
+    case WM_SYSCOMMAND:
+      is_handled = SC_SCREENSAVE == wparam || SC_MONITORPOWER == wparam;
+      break;
+
+    case WM_CLOSE:
+      PostQuitMessage(0);
+      break;
+
+    default:
+      is_handled = false;
+      break;
+  }
+
+  return is_handled ? 0 : DefWindowProc(wnd, msg, wparam, lparam);
 }
+
+} // namespace
