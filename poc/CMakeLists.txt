@@ -10,6 +10,9 @@ set(
     keymap.cpp
     keymap.h
     main.cpp
+    scene.cpp
+    scene.h
+    systemgl.h
     window.cpp
     window.h
 )

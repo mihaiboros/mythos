@@ -1,43 +1,8 @@
 #include "keymap.h"
+#include "scene.h"
 #include "window.h"
 
-#include <gl/GL.h>
-#include <gl/GLU.h>
-
-void init()
-{
-  glShadeModel(GL_SMOOTH);
-  glClearColor(0, 0, 0, 0);
-  glClearDepth(1);
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_EQUAL);
-  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-}
-
-
-
-void resize(int width, int height)
-{
-  glViewport(0, 0, width, height > 0 ? height : 1);
-
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(45, static_cast<double>(width) / height, 0.1, 100);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-}
-
-
-
-void draw(const Window& win)
-{
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-  win.swap_buffers();
-}
-
-
+#include <Windows.h>
 
 /**
  * @brief App entry point
@@ -87,7 +52,8 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
 
     if (!win.is_minimized())
     {
-      draw(win);
+      draw();
+      win.swap_buffers();
     }
 
     if (keys[Key::F1])

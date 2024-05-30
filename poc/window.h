@@ -1,6 +1,5 @@
 #include <cstdint>
 #include <memory>
-#include <Windows.h>
 
 class Window
 {
