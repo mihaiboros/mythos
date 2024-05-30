@@ -37,6 +37,8 @@ void draw(const Window& win)
   win.swap_buffers();
 }
 
+
+
 /**
  * @brief App entry point
  * @param inst
@@ -47,7 +49,7 @@ void draw(const Window& win)
  */
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_show)
 {
-  Keymap keymap;
+  Keymap keys;
   Window win("POC", 800, 600, 16);
   resize(800, 600);
   init();
@@ -65,11 +67,11 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
       switch (msg.message)
       {
         case WM_KEYDOWN:
-          keymap.keys[msg.wParam] = true;
+          keys[static_cast<uint8_t>(msg.wParam)] = true;
           break;
 
         case WM_KEYUP:
-          keymap.keys[msg.wParam] = false;
+          keys[static_cast<uint8_t>(msg.wParam)] = false;
           break;
 
         case WM_SIZE:
@@ -88,9 +90,9 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
       draw(win);
     }
 
-    if (keymap.keys[VK_F1])
+    if (keys[Key::F1])
     {
-      keymap.keys[VK_F1] = false;
+      keys[Key::F1] = false;
       win.switch_fullscreen();
     }
   }
