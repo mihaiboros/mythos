@@ -1,3 +1,6 @@
+#ifndef __SYSGL_H__
+#define __SYSGL_H__
+
 #ifndef WINGDIAPI
 #define WINGDIAPI __declspec(dllimport)
 #endif
@@ -12,3 +15,5 @@
 
 #include <gl/GL.h>
 #include <gl/GLU.h>
+
+#endif //__SYSGL_H__

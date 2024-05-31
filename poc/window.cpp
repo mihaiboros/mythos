@@ -6,7 +6,7 @@ namespace
 {
 
 constexpr const char* class_name = "OpenGL";
-Window::Impl* win = nullptr;
+poc::Window::Impl* win = nullptr;
 
 /**
  * @brief Make a pixel format descriptor for a window
@@ -26,14 +26,15 @@ LRESULT CALLBACK wndproc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 } // namespace
 
+namespace poc
+{
+
 struct Window::Impl
 {
   /**
    * @brief Construct a new object
-   * @param awidth Window width
-   * @param aheight Window height
    */
-  Impl(int32_t awidth, int32_t aheight);
+  Impl() = default;
 
   /**
    * @brief Destroy the object
@@ -43,10 +44,12 @@ struct Window::Impl
   /**
    * @brief Create the window
    * @param title Window title
+   * @param width Window width
+   * @param height Window height
    * @param bits Color bits 16/24/32
    * @return bool Result of operation
    */
-  bool create(const char* title, uint8_t bits);
+  bool create(const char* title, int32_t width, int32_t height, uint8_t bits);
 
   /**
    * @brief Release window and resources
@@ -57,10 +60,6 @@ struct Window::Impl
   bool is_minimized = false;
   // Window in fullscreen
   bool is_fullscreen = false;
-  // window width
-  int32_t width = 800;
-  // window height
-  int32_t height = 600;
 
   // Permanent rendering context
   HGLRC rc = nullptr;
@@ -78,12 +77,6 @@ struct Window::Impl
 
 
 
-inline Window::Impl::Impl(int32_t awidth, int32_t aheight) : width{awidth}, height{aheight}
-{
-}
-
-
-
 inline Window::Impl::~Impl()
 {
   release();
@@ -91,7 +84,7 @@ inline Window::Impl::~Impl()
 
 
 
-bool Window::Impl::create(const char* title, uint8_t bits)
+bool Window::Impl::create(const char* title, int32_t width, int32_t height, uint8_t bits)
 {
   uint32_t pixel_format = 0;
   WNDCLASS wc;
@@ -211,9 +204,9 @@ void Window::Impl::release()
 
 
 Window::Window(const char* title, int32_t width, int32_t height, uint8_t bits)
-  : mimpl(std::make_unique<Window::Impl>(width, height))
+  : mimpl(std::make_unique<Window::Impl>())
 {
-  if (mimpl->create(title, bits))
+  if (mimpl->create(title, width, height, bits))
   {
     win = mimpl.get();
   }
@@ -307,6 +300,8 @@ bool Window::is_valid() const
 {
   return mimpl.get() == win;
 }
+
+} // namespace poc
 
 
 

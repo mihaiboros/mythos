@@ -1,5 +1,11 @@
+#ifndef __POC_WINDOW_H__
+#define __POC_WINDOW_H__
+
 #include <cstdint>
 #include <memory>
+
+namespace poc
+{
 
 class Window
 {
@@ -58,3 +64,7 @@ private:
   // Window implementation
   std::unique_ptr<Impl> mimpl;
 };
+
+} // namespace poc
+
+#endif //__POC_WINDOW_H__

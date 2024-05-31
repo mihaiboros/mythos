@@ -7,12 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(
     SOURCE_FILES
+    app.cpp
+    app.h
     keymap.cpp
     keymap.h
     main.cpp
     scene.cpp
     scene.h
-    systemgl.h
+    sysgl.h
     window.cpp
     window.h
 )

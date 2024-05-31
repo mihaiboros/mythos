@@ -1,6 +1,4 @@
-#include "keymap.h"
-#include "scene.h"
-#include "window.h"
+#include "app.h"
 
 #include <Windows.h>
 
@@ -14,13 +12,10 @@
  */
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_show)
 {
-  Keymap keys;
-  Window win("POC", 800, 600, 16);
-  resize(800, 600);
-  init();
+  poc::App app("POC", 800, 600, 16);
 
   MSG msg;
-  while (win.is_valid())
+  while (app.is_valid())
   {
     if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
@@ -32,15 +27,15 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
       switch (msg.message)
       {
         case WM_KEYDOWN:
-          keys[static_cast<uint8_t>(msg.wParam)] = true;
+          app.set_key(static_cast<uint8_t>(msg.wParam), true);
           break;
 
         case WM_KEYUP:
-          keys[static_cast<uint8_t>(msg.wParam)] = false;
+          app.set_key(static_cast<uint8_t>(msg.wParam), false);
           break;
 
         case WM_SIZE:
-          resize(LOWORD(msg.lParam), HIWORD(msg.lParam));
+          app.resize(LOWORD(msg.lParam), HIWORD(msg.lParam));
           break;
 
         default:
@@ -50,17 +45,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
       }
     }
 
-    if (!win.is_minimized())
-    {
-      draw();
-      win.swap_buffers();
-    }
-
-    if (keys[Key::F1])
-    {
-      keys[Key::F1] = false;
-      win.switch_fullscreen();
-    }
+    app.execute_frame();
   }
 
   return static_cast<int>(msg.wParam);

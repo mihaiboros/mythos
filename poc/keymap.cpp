@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <Windows.h>
 
+namespace poc
+{
+
 Keymap::Keymap()
 {
   mnames[Key::Num0] = VK_NUMPAD0;
@@ -183,3 +186,5 @@ void Keymap::print_last()
   }
 #endif
 }
+
+} // namespace poc

@@ -1,4 +1,10 @@
+#ifndef __POC_KEYMAP_H__
+#define __POC_KEYMAP_H__
+
 #include <cstdint>
+
+namespace poc
+{
 
 struct Key
 {
@@ -179,3 +185,7 @@ inline bool Keymap::operator[](Key::Special key) const
 {
   return mstate[mnames[key]];
 }
+
+} // namespace poc
+
+#endif //__POC_KEYMAP_H__
