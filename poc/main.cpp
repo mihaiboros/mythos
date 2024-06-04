@@ -14,6 +14,11 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
 {
   poc::App app("POC", 800, 600, 16);
 
+  if (app.is_valid())
+  {
+    app.load();
+  }
+
   MSG msg;
   while (app.is_valid())
   {

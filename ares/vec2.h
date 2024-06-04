@@ -15,6 +15,18 @@ struct Vec2;
 using ivec2 = Vec2<int32_t>;
 using dvec2 = Vec2<double>;
 
+/**
+ * @brief Multiplication operator
+ * @tparam T Scalar type
+ * @tparam U Vector type
+ * @param scalar Scalar value
+ * @param v Vector to multiply
+ * @return Vec2 Result of operation
+ */
+template <typename T, typename U>
+requires Arithmetic<T>
+constexpr Vec2<std::common_type_t<T, U>> operator*(T scalar, const Vec2<U>& v);
+
 template <typename T>
 requires Arithmetic<T>
 struct Vec2
@@ -36,7 +48,7 @@ struct Vec2
   template <typename U> constexpr Vec2<std::common_type_t<T, U>> operator-(const Vec2<U>& v) const;
 
   /**
-   * @brief Cros product of the vectors
+   * @brief Cross product of the vectors
    * @tparam U Type of other vector
    * @param v Vector to use in cross product
    * @return common_type_t<T, U> Result of operation
@@ -50,6 +62,26 @@ struct Vec2
    * @return common_type_t<T, U> Result of operation
    */
   template <typename U> constexpr std::common_type_t<T, U> dot(const Vec2<U>& v) const;
+
+  /**
+   * @brief Multiplication operator
+   * @tparam U Scalar type
+   * @param scalar Scalar value
+   * @return Vec2 Result of operation
+   */
+  template <typename U>
+  requires Arithmetic<U>
+  constexpr Vec2<std::common_type_t<T, U>> operator*(U scalar) const;
+
+  /**
+   * @brief Division operator
+   * @tparam U Scalar type
+   * @param scalar Scalar value
+   * @return Vec2 Result of operation
+   */
+  template <typename U>
+  requires Arithmetic<U>
+  constexpr Vec2<std::common_type_t<T, U>> operator/(U scalar) const;
 
   /**
    * @brief Check if the vector is zero
@@ -72,7 +104,19 @@ struct Vec2
   template <typename U = T>
   constexpr std::enable_if_t<std::is_floating_point_v<U>> normalize(double eps = 1e-6);
 
+  /**
+   * @brief Get a normalized vector, length of 1
+   * @tparam U Used for SFINAE
+   * @param eps Minimum value below which length is considered zero and normalization can't occur
+   * @return Vec2 Normalized vector
+   */
+  template <typename U = T>
+  constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec2<T>> get_normalized(
+    double eps = 1e-6) const;
+
+  // value on x axis
   T x{0};
+  // value on y axis
   T y{0};
 };
 
@@ -120,6 +164,28 @@ constexpr std::common_type_t<T, U> Vec2<T>::dot(const Vec2<U>& v) const
 
 template <typename T>
 requires Arithmetic<T>
+template <typename U>
+requires Arithmetic<U>
+constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator*(U scalar) const
+{
+  return {.x = x * scalar, .y = y * scalar};
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
+template <typename U>
+requires Arithmetic<U>
+constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator/(U scalar) const
+{
+  return {.x = x / scalar, .y = y / scalar};
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
 constexpr bool Vec2<T>::is_zero(T eps) const
 {
   if constexpr (std::is_floating_point_v<T>)
@@ -154,6 +220,19 @@ constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec2<T>::normalize(doubl
     x /= len;
     y /= len;
   }
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
+template <typename U>
+constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec2<T>> Vec2<T>::get_normalized(
+  double eps) const
+{
+  Vec2<T> result{*this};
+  result.normalize(eps);
+  return result;
 }
 
 } // namespace ares

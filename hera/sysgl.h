@@ -1,6 +1,7 @@
 #ifndef __SYSGL_H__
 #define __SYSGL_H__
 
+// Windows defines
 #ifndef WINGDIAPI
 #define WINGDIAPI __declspec(dllimport)
 #endif

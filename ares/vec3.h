@@ -15,6 +15,18 @@ struct Vec3;
 using ivec3 = Vec3<int32_t>;
 using dvec3 = Vec3<double>;
 
+/**
+ * @brief Multiplication operator
+ * @tparam T Scalar type
+ * @tparam U Vector type
+ * @param scalar Scalar value
+ * @param v Vector to multiply
+ * @return Vec3 Result of operation
+ */
+template <typename T, typename U>
+requires Arithmetic<T>
+constexpr Vec3<std::common_type_t<T, U>> operator*(T scalar, const Vec3<U>& v);
+
 template <typename T>
 requires Arithmetic<T>
 struct Vec3
@@ -36,7 +48,7 @@ struct Vec3
   template <typename U> constexpr Vec3<std::common_type_t<T, U>> operator-(const Vec3<U>& v) const;
 
   /**
-   * @brief Cros product of the vectors
+   * @brief Cross product of the vectors
    * @tparam U Type of other vector
    * @param v Vector to use in cross product
    * @return Vec3 Result of operation
@@ -52,6 +64,26 @@ struct Vec3
   template <typename U> constexpr std::common_type_t<T, U> dot(const Vec3<U>& v) const;
 
   /**
+   * @brief Multiplication operator
+   * @tparam U Scalar type
+   * @param scalar Scalar value
+   * @return Vec3 Result of operation
+   */
+  template <typename U>
+  requires Arithmetic<U>
+  constexpr Vec3<std::common_type_t<T, U>> operator*(U scalar) const;
+
+  /**
+   * @brief Division operator
+   * @tparam U Scalar type
+   * @param scalar Scalar value
+   * @return Vec3 Result of operation
+   */
+  template <typename U>
+  requires Arithmetic<U>
+  constexpr Vec3<std::common_type_t<T, U>> operator/(U scalar) const;
+
+  /**
    * @brief Check if the vector is zero
    * @param eps Minimum value below which it is considered zero
    * @return bool Result of check
@@ -65,15 +97,36 @@ struct Vec3
   constexpr double length() const;
 
   /**
-   * @brief Normalize the vector, length becoms 1
+   * @brief Normalize the vector, length becomes 1
    * @tparam U Used for SFINAE
    * @param eps Minimum value below which length is considered zero and normalization can't occur
    */
   template <typename U = T>
   constexpr std::enable_if_t<std::is_floating_point_v<U>> normalize(double eps = 1e-6);
 
+  /**
+   * @brief Get a normalized vector, length of 1
+   * @tparam U Used for SFINAE
+   * @param eps Minimum value below which length is considered zero and normalization can't occur
+   * @return Vec3 Normalized vector
+   */
+  template <typename U = T>
+  constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> get_normalized(
+    double eps = 1e-6) const;
+
+  /**
+   * @brief Rotate the vector around an axis by the provide angle in radians
+   * @tparam U Type of other vector
+   * @param norm_ax Normalized axis to rotate around. Must be normalized!
+   * @param rad Angle to rotate by in radians
+   */
+  template <typename U> void rotate(const Vec3<U>& norm_ax, double rad);
+
+  // value on x axis
   T x{0};
+  // value on y axis
   T y{0};
+  // value on z axis
   T z{0};
 };
 
@@ -121,6 +174,28 @@ constexpr std::common_type_t<T, U> Vec3<T>::dot(const Vec3<U>& v) const
 
 template <typename T>
 requires Arithmetic<T>
+template <typename U>
+requires Arithmetic<U>
+constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator*(U scalar) const
+{
+  return {.x = x * scalar, .y = y * scalar, .z = z * scalar};
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
+template <typename U>
+requires Arithmetic<U>
+constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator/(U scalar) const
+{
+  return {.x = x / scalar, .y = y / scalar, .z = z / scalar};
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
 constexpr bool Vec3<T>::is_zero(T eps) const
 {
   if constexpr (std::is_floating_point_v<T>)
@@ -157,6 +232,43 @@ constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec3<T>::normalize(doubl
     y /= len;
     z /= len;
   }
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
+template <typename U>
+constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> Vec3<T>::get_normalized(
+  double eps) const
+{
+  Vec3<T> result{*this};
+  result.normalize(eps);
+  return result;
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
+template <typename U>
+void Vec3<T>::rotate(const Vec3<U>& norm_ax, double rad)
+{
+  const double cost = std::cos(rad);
+  const double sint = std::sin(rad);
+
+  const auto& v = *this;
+  auto rot = cost * v + sint * (norm_ax * v) + (1 - cost) * norm_ax.dot(v) * norm_ax;
+  *this = rot;
+}
+
+
+
+template <typename T, typename U>
+requires Arithmetic<T>
+constexpr Vec3<std::common_type_t<T, U>> operator*(T scalar, const Vec3<U>& v)
+{
+  return {.x = scalar * v.x, .y = scalar * v.y, .z = scalar * v.z};
 }
 
 } // namespace ares

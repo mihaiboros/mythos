@@ -2,6 +2,7 @@
 #define __POC_SCENE_H__
 
 #include <cstdint>
+#include <hera/model.h>
 
 namespace poc
 {
@@ -25,11 +26,21 @@ public:
   void resize(int32_t width, int32_t height);
 
   /**
+   * @brief Load the scene
+   */
+  void load();
+
+  /**
    * @brief Draw the scene
    */
   void draw();
 
 private:
+
+  // triangle model
+  hera::Model tri;
+  // quad model
+  hera::Model quad;
 };
 
 } // namespace poc

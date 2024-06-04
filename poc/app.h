@@ -28,6 +28,11 @@ public:
   bool is_valid() const;
 
   /**
+   * @brief Load the application
+   */
+  void load();
+
+  /**
    * @brief Set key state
    * @param key_code System key code
    * @param is_pressed Indicates if key has been pressed or released
@@ -69,6 +74,12 @@ inline App::App(const char* title, int32_t width, int32_t height, uint8_t bits)
 inline bool App::is_valid() const
 {
   return mwin.is_valid();
+}
+
+
+
+inline void App::load()
+{
 }
 
 
