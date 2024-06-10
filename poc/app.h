@@ -80,6 +80,7 @@ inline bool App::is_valid() const
 
 inline void App::load()
 {
+  mscene.load();
 }
 
 

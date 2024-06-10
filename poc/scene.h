@@ -37,10 +37,12 @@ public:
 
 private:
 
-  // triangle model
-  hera::Model tri;
-  // quad model
-  hera::Model quad;
+  // model out of triangles
+  hera::Model mtris;
+  // model out of quads
+  hera::Model mquads;
+  // texture id
+  uint32_t mtex_id{0};
 };
 
 } // namespace poc

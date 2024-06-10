@@ -102,7 +102,7 @@ struct Vec3
    * @param eps Minimum value below which length is considered zero and normalization can't occur
    */
   template <typename U = T>
-  constexpr std::enable_if_t<std::is_floating_point_v<U>> normalize(double eps = 1e-6);
+  constexpr std::enable_if_t<std::is_floating_point_v<U>> normalize(T eps = 1e-6);
 
   /**
    * @brief Get a normalized vector, length of 1
@@ -112,15 +112,18 @@ struct Vec3
    */
   template <typename U = T>
   constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> get_normalized(
-    double eps = 1e-6) const;
+    T eps = 1e-6) const;
 
   /**
    * @brief Rotate the vector around an axis by the provide angle in radians
-   * @tparam U Type of other vector
+   * @tparam U U Type of other vector
+   * @tparam V Used for SFINAE
    * @param norm_ax Normalized axis to rotate around. Must be normalized!
    * @param rad Angle to rotate by in radians
+   * @return constexpr std::enable_if_t<std::is_floating_point_v<V>>
    */
-  template <typename U> void rotate(const Vec3<U>& norm_ax, double rad);
+  template <typename U, typename V = T>
+  constexpr std::enable_if_t<std::is_floating_point_v<V>> rotate(const Vec3<U>& norm_ax, T rad);
 
   // value on x axis
   T x{0};
@@ -224,9 +227,9 @@ constexpr double Vec3<T>::length() const
 template <typename T>
 requires Arithmetic<T>
 template <typename U>
-constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec3<T>::normalize(double eps)
+constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec3<T>::normalize(T eps)
 {
-  if (double len = length(); FP_NORMAL == std::fpclassify(len) && len >= eps)
+  if (T len = length(); FP_NORMAL == std::fpclassify(len) && len >= eps)
   {
     x /= len;
     y /= len;
@@ -240,7 +243,7 @@ template <typename T>
 requires Arithmetic<T>
 template <typename U>
 constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> Vec3<T>::get_normalized(
-  double eps) const
+  T eps) const
 {
   Vec3<T> result{*this};
   result.normalize(eps);
@@ -251,15 +254,19 @@ constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> Vec3<T>::get_no
 
 template <typename T>
 requires Arithmetic<T>
-template <typename U>
-void Vec3<T>::rotate(const Vec3<U>& norm_ax, double rad)
+template <typename U, typename V>
+constexpr std::enable_if_t<std::is_floating_point_v<V>> Vec3<T>::rotate(
+  const Vec3<U>& norm_ax, T rad)
 {
-  const double cost = std::cos(rad);
-  const double sint = std::sin(rad);
+  const T cost = std::cos(rad);
+  const T sint = std::sin(rad);
 
   const auto& v = *this;
-  auto rot = cost * v + sint * (norm_ax * v) + (1 - cost) * norm_ax.dot(v) * norm_ax;
-  *this = rot;
+  const auto rot = cost * v + sint * (norm_ax * v) + (1 - cost) * norm_ax.dot(v) * norm_ax;
+
+  x = rot.x;
+  y = rot.y;
+  z = rot.z;
 }
 
 

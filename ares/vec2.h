@@ -102,7 +102,7 @@ struct Vec2
    * @param eps Minimum value below which length is considered zero and normalization can't occur
    */
   template <typename U = T>
-  constexpr std::enable_if_t<std::is_floating_point_v<U>> normalize(double eps = 1e-6);
+  constexpr std::enable_if_t<std::is_floating_point_v<U>> normalize(T eps = 1e-6);
 
   /**
    * @brief Get a normalized vector, length of 1
@@ -112,7 +112,7 @@ struct Vec2
    */
   template <typename U = T>
   constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec2<T>> get_normalized(
-    double eps = 1e-6) const;
+    T eps = 1e-6) const;
 
   // value on x axis
   T x{0};
@@ -213,9 +213,9 @@ constexpr double Vec2<T>::length() const
 template <typename T>
 requires Arithmetic<T>
 template <typename U>
-constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec2<T>::normalize(double eps)
+constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec2<T>::normalize(T eps)
 {
-  if (double len = length(); FP_NORMAL == std::fpclassify(len) && len >= eps)
+  if (T len = length(); FP_NORMAL == std::fpclassify(len) && len >= eps)
   {
     x /= len;
     y /= len;
@@ -228,7 +228,7 @@ template <typename T>
 requires Arithmetic<T>
 template <typename U>
 constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec2<T>> Vec2<T>::get_normalized(
-  double eps) const
+  T eps) const
 {
   Vec2<T> result{*this};
   result.normalize(eps);
