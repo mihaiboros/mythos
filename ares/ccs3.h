@@ -11,7 +11,7 @@ template <typename T>
 requires Floating_point<T>
 struct Ccs3;
 
-using dccs3 = Ccs3<double>;
+using dCcs3 = Ccs3<double>;
 
 /**
  * @brief Right handed cartesian coordinate system

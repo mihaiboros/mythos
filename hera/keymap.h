@@ -1,9 +1,9 @@
-#ifndef __POC_KEYMAP_H__
-#define __POC_KEYMAP_H__
+#ifndef __HERA_KEYMAP_H__
+#define __HERA_KEYMAP_H__
 
 #include <cstdint>
 
-namespace poc
+namespace hera
 {
 
 struct Key
@@ -160,32 +160,32 @@ private:
   void print_last();
 
   // Keyboard state
-  bool mstate[256] = {false};
+  bool m_state[256] = {false};
   // Keboard mapping
-  uint8_t mnames[Key::special_keys_count] = {0};
+  uint8_t m_names[Key::special_keys_count] = {0};
 };
 
 
 
 inline bool& Keymap::operator[](uint8_t sys_key)
 {
-  return mstate[sys_key];
+  return m_state[sys_key];
 }
 
 
 
 inline bool& Keymap::operator[](Key::Special key)
 {
-  return mstate[mnames[key]];
+  return m_state[m_names[key]];
 }
 
 
 
 inline bool Keymap::operator[](Key::Special key) const
 {
-  return mstate[mnames[key]];
+  return m_state[m_names[key]];
 }
 
-} // namespace poc
+} // namespace hera
 
-#endif //__POC_KEYMAP_H__
+#endif //__HERA_KEYMAP_H__

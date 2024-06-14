@@ -1,80 +1,80 @@
-#include "keymap.h"
+#include "../keymap.h"
 
 #include <algorithm>
 #include <Windows.h>
 
-namespace poc
+namespace hera
 {
 
 Keymap::Keymap()
 {
-  mnames[Key::Num0] = VK_NUMPAD0;
-  mnames[Key::Num1] = VK_NUMPAD1;
-  mnames[Key::Num2] = VK_NUMPAD2;
-  mnames[Key::Num3] = VK_NUMPAD3;
-  mnames[Key::Num4] = VK_NUMPAD4;
-  mnames[Key::Num5] = VK_NUMPAD5;
-  mnames[Key::Num6] = VK_NUMPAD6;
-  mnames[Key::Num7] = VK_NUMPAD7;
-  mnames[Key::Num8] = VK_NUMPAD8;
-  mnames[Key::Num9] = VK_NUMPAD9;
+  m_names[Key::Num0] = VK_NUMPAD0;
+  m_names[Key::Num1] = VK_NUMPAD1;
+  m_names[Key::Num2] = VK_NUMPAD2;
+  m_names[Key::Num3] = VK_NUMPAD3;
+  m_names[Key::Num4] = VK_NUMPAD4;
+  m_names[Key::Num5] = VK_NUMPAD5;
+  m_names[Key::Num6] = VK_NUMPAD6;
+  m_names[Key::Num7] = VK_NUMPAD7;
+  m_names[Key::Num8] = VK_NUMPAD8;
+  m_names[Key::Num9] = VK_NUMPAD9;
 
-  mnames[Key::Subtract] = VK_SUBTRACT;
-  mnames[Key::Add] = VK_ADD;
-  mnames[Key::Divide] = VK_DIVIDE;
-  mnames[Key::Multiply] = VK_MULTIPLY;
-  mnames[Key::Decimal] = VK_DECIMAL;
+  m_names[Key::Subtract] = VK_SUBTRACT;
+  m_names[Key::Add] = VK_ADD;
+  m_names[Key::Divide] = VK_DIVIDE;
+  m_names[Key::Multiply] = VK_MULTIPLY;
+  m_names[Key::Decimal] = VK_DECIMAL;
 
-  mnames[Key::Minus] = VK_OEM_MINUS;
-  mnames[Key::Equal] = VK_OEM_PLUS;
-  mnames[Key::Tilda] = VK_OEM_3;
-  mnames[Key::Opened] = VK_OEM_4;
-  mnames[Key::Closed] = VK_OEM_6;
-  mnames[Key::Backslash] = VK_OEM_5;
-  mnames[Key::Semicolon] = VK_OEM_1;
-  mnames[Key::Apostrophe] = VK_OEM_7;
-  mnames[Key::Comma] = VK_OEM_COMMA;
-  mnames[Key::Period] = VK_OEM_PERIOD;
-  mnames[Key::Slash] = VK_OEM_2;
-  mnames[Key::Space] = VK_SPACE;
-  mnames[Key::Tab] = VK_TAB;
+  m_names[Key::Minus] = VK_OEM_MINUS;
+  m_names[Key::Equal] = VK_OEM_PLUS;
+  m_names[Key::Tilda] = VK_OEM_3;
+  m_names[Key::Opened] = VK_OEM_4;
+  m_names[Key::Closed] = VK_OEM_6;
+  m_names[Key::Backslash] = VK_OEM_5;
+  m_names[Key::Semicolon] = VK_OEM_1;
+  m_names[Key::Apostrophe] = VK_OEM_7;
+  m_names[Key::Comma] = VK_OEM_COMMA;
+  m_names[Key::Period] = VK_OEM_PERIOD;
+  m_names[Key::Slash] = VK_OEM_2;
+  m_names[Key::Space] = VK_SPACE;
+  m_names[Key::Tab] = VK_TAB;
 
-  mnames[Key::Escape] = VK_ESCAPE;
-  mnames[Key::Backspace] = VK_BACK;
-  mnames[Key::Caps] = VK_CAPITAL;
-  mnames[Key::Enter] = VK_RETURN;
-  mnames[Key::Shift] = VK_SHIFT;
-  mnames[Key::Ctrl] = VK_CONTROL;
+  m_names[Key::Escape] = VK_ESCAPE;
+  m_names[Key::Backspace] = VK_BACK;
+  m_names[Key::Caps] = VK_CAPITAL;
+  m_names[Key::Enter] = VK_RETURN;
+  m_names[Key::Shift] = VK_SHIFT;
+  m_names[Key::Ctrl] = VK_CONTROL;
 
-  mnames[Key::Left] = VK_LEFT;
-  mnames[Key::Up] = VK_UP;
-  mnames[Key::Right] = VK_RIGHT;
-  mnames[Key::Down] = VK_DOWN;
+  m_names[Key::Left] = VK_LEFT;
+  m_names[Key::Up] = VK_UP;
+  m_names[Key::Right] = VK_RIGHT;
+  m_names[Key::Down] = VK_DOWN;
 
-  mnames[Key::Delete] = VK_DELETE;
-  mnames[Key::Insert] = VK_INSERT;
-  mnames[Key::Home] = VK_HOME;
-  mnames[Key::Pgup] = VK_PRIOR;
-  mnames[Key::Pgdn] = VK_NEXT;
-  mnames[Key::End] = VK_END;
+  m_names[Key::Delete] = VK_DELETE;
+  m_names[Key::Insert] = VK_INSERT;
+  m_names[Key::Home] = VK_HOME;
+  m_names[Key::Pgup] = VK_PRIOR;
+  m_names[Key::Pgdn] = VK_NEXT;
+  m_names[Key::End] = VK_END;
 
-  mnames[Key::F1] = VK_F1;
-  mnames[Key::F2] = VK_F2;
-  mnames[Key::F3] = VK_F3;
-  mnames[Key::F4] = VK_F4;
-  mnames[Key::F5] = VK_F5;
-  mnames[Key::F6] = VK_F6;
-  mnames[Key::F7] = VK_F7;
-  mnames[Key::F8] = VK_F8;
-  mnames[Key::F9] = VK_F9;
-  mnames[Key::F10] = VK_F10;
-  mnames[Key::F11] = VK_F11;
-  mnames[Key::F12] = VK_F12;
+  m_names[Key::F1] = VK_F1;
+  m_names[Key::F2] = VK_F2;
+  m_names[Key::F3] = VK_F3;
+  m_names[Key::F4] = VK_F4;
+  m_names[Key::F5] = VK_F5;
+  m_names[Key::F6] = VK_F6;
+  m_names[Key::F7] = VK_F7;
+  m_names[Key::F8] = VK_F8;
+  m_names[Key::F9] = VK_F9;
+  m_names[Key::F10] = VK_F10;
+  m_names[Key::F11] = VK_F11;
+  m_names[Key::F12] = VK_F12;
 
-  mnames[Key::Pause] = VK_PAUSE;
-  mnames[Key::Print] = VK_PRINT;
-  mnames[Key::Numlock] = VK_NUMLOCK;
-  mnames[Key::Scroll] = VK_SCROLL;
+  m_names[Key::Pause] = VK_PAUSE;
+  m_names[Key::Print] = VK_PRINT;
+  m_names[Key::Numlock] = VK_NUMLOCK;
+  m_names[Key::Scroll] = VK_SCROLL;
 }
 
 
@@ -154,8 +154,8 @@ void Keymap::print_last()
     desc[Key::Scroll] = "SCROLL";
   }
 
-  bool* end = mstate + sizeof(mstate);
-  bool* pos = std::find(mstate, end, true);
+  bool* end = m_state + sizeof(m_state);
+  bool* pos = std::find(m_state, end, true);
   if (end == pos)
   {
     return;
@@ -164,7 +164,7 @@ void Keymap::print_last()
   static char str[30] = {0};
   *pos = false;
 
-  int name = static_cast<int>(pos - mstate);
+  int name = static_cast<int>(pos - m_state);
   if (name >= Key::K0 && name <= Key::K9 || name >= Key::A && name <= Key::Z)
   {
     sprintf_s(str, sizeof(str), "Key: %c \n", name);
@@ -172,11 +172,11 @@ void Keymap::print_last()
   }
   else
   {
-    uint8_t* nend = mnames + Key::special_keys_count;
-    uint8_t* npos = std::find(mnames, nend, name);
+    uint8_t* nend = m_names + Key::special_keys_count;
+    uint8_t* npos = std::find(m_names, nend, name);
     if (npos != nend)
     {
-      int id = static_cast<int>(npos - mnames);
+      int id = static_cast<int>(npos - m_names);
       sprintf_s(str,
         sizeof(str),
         "Key: %s \n",
@@ -187,4 +187,4 @@ void Keymap::print_last()
 #endif
 }
 
-} // namespace poc
+} // namespace hera

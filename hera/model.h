@@ -12,8 +12,10 @@ namespace hera
 
 struct Model
 {
+  // model out of triangles or quads
+  bool has_quads{false};
   // local coordinate system
-  ares::dccs3 cs;
+  ares::dCcs3 cs;
   // model vertices in local coordinates
   std::vector<Vertex> vertices;
 };

@@ -1,10 +1,10 @@
-#ifndef __POC_WINDOW_H__
-#define __POC_WINDOW_H__
+#ifndef __HERA_WINDOW_H__
+#define __HERA_WINDOW_H__
 
 #include <cstdint>
 #include <memory>
 
-namespace poc
+namespace hera
 {
 
 class Window
@@ -62,9 +62,9 @@ public:
 private:
 
   // Window implementation
-  std::unique_ptr<Impl> mimpl;
+  std::unique_ptr<Impl> m_impl;
 };
 
-} // namespace poc
+} // namespace hera
 
-#endif //__POC_WINDOW_H__
+#endif //__HERA_WINDOW_H__

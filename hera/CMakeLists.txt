@@ -12,9 +12,16 @@ set(
     ext/stb_image.h
     image.cpp
     image.h
+    keymap.h
+    light.h
     model.h
-    sysgl.h
+    opengl/model_gl.h
+    opengl/sysgl.h
+    opengl/texture_gl.h
     vertex.h
+    win/keymap.cpp
+    win/window.cpp
+    window.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})

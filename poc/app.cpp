@@ -3,18 +3,20 @@
 namespace poc
 {
 
+using hera::Key;
+
 void App::execute_frame()
 {
-  if (mkeys[Key::F1])
+  if (m_keys[Key::F1])
   {
-    mkeys[Key::F1] = false;
-    mwin.switch_fullscreen();
+    m_keys[Key::F1] = false;
+    m_win.switch_fullscreen();
   }
 
-  if (!mwin.is_minimized())
+  if (!m_win.is_minimized())
   {
-    mscene.draw();
-    mwin.swap_buffers();
+    m_scene.draw();
+    m_win.swap_buffers();
   }
 }
 

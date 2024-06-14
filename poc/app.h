@@ -1,9 +1,10 @@
 #ifndef __POC_APP_H__
 #define __POC_APP_H__
 
-#include "keymap.h"
 #include "scene.h"
-#include "window.h"
+
+#include <hera/keymap.h>
+#include <hera/window.h>
 
 namespace poc
 {
@@ -54,47 +55,47 @@ public:
 private:
 
   // App window
-  Window mwin;
+  hera::Window m_win;
   // App scene
-  Scene mscene;
+  Scene m_scene;
   // App keyboard state
-  Keymap mkeys;
+  hera::Keymap m_keys;
 };
 
 
 
 inline App::App(const char* title, int32_t width, int32_t height, uint8_t bits)
-  : mwin(title, width, height, bits)
+  : m_win(title, width, height, bits)
 {
-  mscene.init(width, height);
+  m_scene.init(width, height);
 }
 
 
 
 inline bool App::is_valid() const
 {
-  return mwin.is_valid();
+  return m_win.is_valid();
 }
 
 
 
 inline void App::load()
 {
-  mscene.load();
+  m_scene.load();
 }
 
 
 
 inline void App::set_key(uint8_t key_code, bool is_pressed)
 {
-  mkeys[key_code] = is_pressed;
+  m_keys[key_code] = is_pressed;
 }
 
 
 
 inline void App::resize(int32_t width, int32_t height)
 {
-  mscene.resize(width, height);
+  m_scene.resize(width, height);
 }
 
 } // namespace poc

@@ -12,11 +12,11 @@ namespace hera
 struct Vertex
 {
   // vertex position
-  ares::dvec3 pos;
+  ares::dVec3 pos;
   // vertex color
   Color color;
   // texture coord
-  ares::dvec2 tex;
+  ares::dVec2 tex;
 };
 
 } // namespace hera

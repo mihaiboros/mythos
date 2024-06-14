@@ -1,7 +1,9 @@
 #include "scene.h"
 
 #include <hera/image.h>
-#include <hera/sysgl.h>
+#include <hera/opengl/model_gl.h>
+#include <hera/opengl/sysgl.h>
+#include <hera/opengl/texture_gl.h>
 
 namespace
 {
@@ -63,7 +65,8 @@ void Scene::resize(int32_t width, int32_t height)
 
 void Scene::load()
 {
-  mquads = {.cs = {.o = {.z = -5}},
+  m_quads = {.has_quads = true,
+    .cs = {.o = {.z = -5}},
     .vertices = {{.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
       {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
       {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
@@ -96,13 +99,10 @@ void Scene::load()
 
   hera::Image img;
   img.load("resources/4_store.bmp");
+  m_tex_id = hera::make_texture(img);
 
-  glEnable(GL_TEXTURE_2D);
-  glGenTextures(1, &mtex_id);
-  glBindTexture(GL_TEXTURE_2D, mtex_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, 3, img.width, img.height, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data());
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  m_amb = {.color = {.r = 128, .g = 128, .b = 128, .a = 255}, .is_ambiental = true};
+  m_dif = {.pos = {.z = 2}, .color = {.r = 255, .g = 255, .b = 255, .a = 255}};
 }
 
 
@@ -115,22 +115,8 @@ void Scene::draw()
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glLoadIdentity();
-  glTranslated(mquads.cs.o.x, mquads.cs.o.y, mquads.cs.o.z);
-
-  glRotated(xr, 1, 0, 0);
-  glRotated(yr, 0, 1, 0);
-  glRotated(zr, 0, 0, 1);
-
-  glBindTexture(GL_TEXTURE_2D, mtex_id);
-
-  glBegin(GL_QUADS);
-  for (const auto& v : mquads.vertices)
-  {
-    glTexCoord2d(v.tex.x, v.tex.y);
-    glVertex3d(v.pos.x, v.pos.y, v.pos.z);
-  }
-  glEnd();
+  hera::bind_texture(m_tex_id);
+  hera::render_textured(m_quads, xr, yr, zr);
 
   xr += 0.3;
   yr += 0.2;
@@ -168,7 +154,8 @@ hera::Model make_tris()
 
 hera::Model make_quads()
 {
-  return {.cs = {.o = {.x = 1.5, .z = -7}},
+  return {.has_quads = true,
+    .cs = {.o = {.x = 1.5, .z = -7}},
     .vertices = {{.pos = {.x = 1, .y = 1, .z = -1}, .color = {.g = 255}},
       {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.g = 255}},
       {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.g = 255}},
@@ -209,29 +196,8 @@ void render_simple_models(const hera::Model& tris, const hera::Model& quads)
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glLoadIdentity();
-  glTranslated(tris.cs.o.x, tris.cs.o.y, tris.cs.o.z);
-  glRotated(tr, 0, 1, 0);
-
-  glBegin(GL_TRIANGLES);
-  for (const auto& v : tris.vertices)
-  {
-    glColor3ub(v.color.r, v.color.g, v.color.b);
-    glVertex3d(v.pos.x, v.pos.y, v.pos.z);
-  }
-  glEnd();
-
-  glLoadIdentity();
-  glTranslated(quads.cs.o.x, quads.cs.o.y, quads.cs.o.z);
-  glRotated(qr, 1, 1, 1);
-
-  glBegin(GL_QUADS);
-  for (const auto& v : quads.vertices)
-  {
-    glColor3ub(v.color.r, v.color.g, v.color.b);
-    glVertex3d(v.pos.x, v.pos.y, v.pos.z);
-  }
-  glEnd();
+  hera::render_colored(tris, 0, tr, 0);
+  hera::render_colored(quads, qr, qr, qr);
 
   tr += 0.2;
   qr -= 0.15;

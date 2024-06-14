@@ -1,4 +1,4 @@
-#include "window.h"
+#include "../window.h"
 
 #include <Windows.h>
 
@@ -6,7 +6,7 @@ namespace
 {
 
 constexpr const char* class_name = "OpenGL";
-poc::Window::Impl* win = nullptr;
+hera::Window::Impl* win = nullptr;
 
 /**
  * @brief Make a pixel format descriptor for a window
@@ -26,7 +26,9 @@ LRESULT CALLBACK wndproc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 } // namespace
 
-namespace poc
+
+
+namespace hera
 {
 
 struct Window::Impl
@@ -204,15 +206,15 @@ void Window::Impl::release()
 
 
 Window::Window(const char* title, int32_t width, int32_t height, uint8_t bits)
-  : mimpl(std::make_unique<Window::Impl>())
+  : m_impl(std::make_unique<Window::Impl>())
 {
-  if (mimpl->create(title, width, height, bits))
+  if (m_impl->create(title, width, height, bits))
   {
-    win = mimpl.get();
+    win = m_impl.get();
   }
   else
   {
-    mimpl->release();
+    m_impl->release();
   }
 }
 
@@ -224,14 +226,14 @@ Window::~Window() = default;
 
 void Window::swap_buffers() const
 {
-  SwapBuffers(mimpl->dc);
+  SwapBuffers(m_impl->dc);
 }
 
 
 
 void Window::switch_fullscreen()
 {
-  if (mimpl->is_fullscreen)
+  if (m_impl->is_fullscreen)
   {
     set_windowed();
   }
@@ -245,15 +247,15 @@ void Window::switch_fullscreen()
 
 void Window::set_fullscreen()
 {
-  DWORD style = GetWindowLong(mimpl->wnd, GWL_STYLE);
+  DWORD style = GetWindowLong(m_impl->wnd, GWL_STYLE);
   if (style & WS_OVERLAPPEDWINDOW)
   {
     MONITORINFO info = {sizeof(info)};
-    if (GetWindowPlacement(mimpl->wnd, &mimpl->placement)
-        && GetMonitorInfo(MonitorFromWindow(mimpl->wnd, MONITOR_DEFAULTTOPRIMARY), &info))
+    if (GetWindowPlacement(m_impl->wnd, &m_impl->placement)
+        && GetMonitorInfo(MonitorFromWindow(m_impl->wnd, MONITOR_DEFAULTTOPRIMARY), &info))
     {
-      SetWindowLong(mimpl->wnd, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW);
-      SetWindowPos(mimpl->wnd,
+      SetWindowLong(m_impl->wnd, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW);
+      SetWindowPos(m_impl->wnd,
         HWND_TOP,
         info.rcMonitor.left,
         info.rcMonitor.top,
@@ -261,7 +263,7 @@ void Window::set_fullscreen()
         info.rcMonitor.bottom - info.rcMonitor.top,
         SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
       ShowCursor(FALSE);
-      mimpl->is_fullscreen = true;
+      m_impl->is_fullscreen = true;
     }
   }
 }
@@ -270,12 +272,12 @@ void Window::set_fullscreen()
 
 void Window::set_windowed()
 {
-  DWORD style = GetWindowLong(mimpl->wnd, GWL_STYLE);
+  DWORD style = GetWindowLong(m_impl->wnd, GWL_STYLE);
   if (!(style & WS_OVERLAPPEDWINDOW))
   {
-    SetWindowLong(mimpl->wnd, GWL_STYLE, style | WS_OVERLAPPEDWINDOW);
-    SetWindowPlacement(mimpl->wnd, &mimpl->placement);
-    SetWindowPos(mimpl->wnd,
+    SetWindowLong(m_impl->wnd, GWL_STYLE, style | WS_OVERLAPPEDWINDOW);
+    SetWindowPlacement(m_impl->wnd, &m_impl->placement);
+    SetWindowPos(m_impl->wnd,
       nullptr,
       0,
       0,
@@ -283,7 +285,7 @@ void Window::set_windowed()
       0,
       SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
     ShowCursor(TRUE);
-    mimpl->is_fullscreen = false;
+    m_impl->is_fullscreen = false;
   }
 }
 
@@ -291,17 +293,17 @@ void Window::set_windowed()
 
 bool Window::is_minimized() const
 {
-  return mimpl->is_minimized;
+  return m_impl->is_minimized;
 }
 
 
 
 bool Window::is_valid() const
 {
-  return mimpl.get() == win;
+  return m_impl.get() == win;
 }
 
-} // namespace poc
+} // namespace hera
 
 
 

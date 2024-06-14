@@ -9,13 +9,9 @@ set(
     SOURCE_FILES
     app.cpp
     app.h
-    keymap.cpp
-    keymap.h
     main.cpp
     scene.cpp
     scene.h
-    window.cpp
-    window.h
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
