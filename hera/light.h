@@ -11,11 +11,11 @@ namespace hera
 struct Light
 {
   // light position
-  ares::dVec3 pos;
-  // light color
-  Color color;
-  // flag indicating ambiental light
-  bool is_ambiental{false};
+  ares::fVec3 pos;
+  // ambient light
+  fColor ambient;
+  // diffuse light
+  fColor diffuse;
 };
 
 } // namespace hera

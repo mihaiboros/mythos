@@ -5,19 +5,31 @@
 #include "vertex.h"
 
 #include <ares/ccs3.h>
+#include <array>
 #include <vector>
 
 namespace hera
 {
 
-struct Model
+template <bool Quads> struct Model;
+
+using tModel = Model<false>;
+using qModel = Model<true>;
+
+template <bool Quads> struct Model
 {
-  // model out of triangles or quads
-  bool has_quads{false};
+  struct Face
+  {
+    // face normal
+    ares::dVec3 normal;
+    // face vertices in local coordinates
+    std::array<Vertex, Quads ? 4 : 3> vertices;
+  };
+
   // local coordinate system
   ares::dCcs3 cs;
-  // model vertices in local coordinates
-  std::vector<Vertex> vertices;
+  // model faces
+  std::vector<Face> faces;
 };
 
 } // namespace hera

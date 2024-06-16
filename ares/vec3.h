@@ -3,6 +3,7 @@
 
 #include "concepts.h"
 
+#include <array>
 #include <cmath>
 
 namespace ares
@@ -12,8 +13,9 @@ template <typename T>
 requires Arithmetic<T>
 struct Vec3;
 
-using iVec3 = Vec3<int32_t>;
 using dVec3 = Vec3<double>;
+using fVec3 = Vec3<float>;
+using iVec3 = Vec3<int32_t>;
 
 /**
  * @brief Multiplication operator
@@ -82,6 +84,15 @@ struct Vec3
   template <typename U>
   requires Arithmetic<U>
   constexpr Vec3<std::common_type_t<T, U>> operator/(U scalar) const;
+
+  /**
+   * @brief Get vector as an array
+   * @tparam U Array type
+   * @return std::array<U, 4> Coordinates array
+   */
+  template <typename U = T>
+  requires Arithmetic<U>
+  std::array<U, 4> xyzw() const;
 
   /**
    * @brief Check if the vector is zero
@@ -193,6 +204,17 @@ requires Arithmetic<U>
 constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator/(U scalar) const
 {
   return {.x = x / scalar, .y = y / scalar, .z = z / scalar};
+}
+
+
+
+template <typename T>
+requires Arithmetic<T>
+template <typename U>
+requires Arithmetic<U>
+std::array<U, 4> Vec3<T>::xyzw() const
+{
+  return {x, y, z, 1};
 }
 
 

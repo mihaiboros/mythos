@@ -143,14 +143,28 @@ public:
    * @param key Name of the key to get
    * @return bool& Key state
    */
-  bool& operator[](Key::Special key);
+  bool& operator[](Key::Alnum key);
+
+  /**
+   * @brief Indexer operator to get key state
+   * @param key Name of the key to get
+   * @return const bool& Key state
+   */
+  const bool& operator[](Key::Alnum key) const;
 
   /**
    * @brief Indexer operator to get key state
    * @param key Name of the key to get
    * @return bool& Key state
    */
-  bool operator[](Key::Special key) const;
+  bool& operator[](Key::Special key);
+
+  /**
+   * @brief Indexer operator to get key state
+   * @param key Name of the key to get
+   * @return const bool& Key state
+   */
+  const bool& operator[](Key::Special key) const;
 
 private:
 
@@ -174,6 +188,20 @@ inline bool& Keymap::operator[](uint8_t sys_key)
 
 
 
+inline bool& Keymap::operator[](Key::Alnum key)
+{
+  return m_state[key];
+}
+
+
+
+inline const bool& Keymap::operator[](Key::Alnum key) const
+{
+  return m_state[key];
+}
+
+
+
 inline bool& Keymap::operator[](Key::Special key)
 {
   return m_state[m_names[key]];
@@ -181,7 +209,7 @@ inline bool& Keymap::operator[](Key::Special key)
 
 
 
-inline bool Keymap::operator[](Key::Special key) const
+inline const bool& Keymap::operator[](Key::Special key) const
 {
   return m_state[m_names[key]];
 }

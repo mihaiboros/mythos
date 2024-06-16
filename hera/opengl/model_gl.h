@@ -9,21 +9,25 @@ namespace hera
 
 /**
  * @brief Render model with color
+ * @tparam Quads Flag indicating quads
  * @param model Model to render
  * @param xr Rotation around x axis
  * @param yr Rotation around y axis
  * @param zr Rotation around z axis
  */
-void render_colored(const Model& model, double xr, double yr, double zr);
+template <bool Quads>
+void render_colored(const Model<Quads>& model, double xr, double yr, double zr);
 
 /**
  * @brief Render model with texture
+ * @tparam Quads Flag indicating quads
  * @param model Model to render
  * @param xr Rotation around x axis
  * @param yr Rotation around y axis
  * @param zr Rotation around z axis
  */
-void render_textured(const Model& model, double xr, double yr, double zr);
+template <bool Quads>
+void render_textured(const Model<Quads>& model, double xr, double yr, double zr);
 
 } // namespace hera
 
@@ -32,7 +36,8 @@ void render_textured(const Model& model, double xr, double yr, double zr);
 namespace hera
 {
 
-inline void render_colored(const Model& model, double xr, double yr, double zr)
+template <bool Quads>
+void render_colored(const Model<Quads>& model, double xr, double yr, double zr)
 {
   glLoadIdentity();
   glTranslated(model.cs.o.x, model.cs.o.y, model.cs.o.z);
@@ -41,18 +46,23 @@ inline void render_colored(const Model& model, double xr, double yr, double zr)
   glRotated(yr, 0, 1, 0);
   glRotated(zr, 0, 0, 1);
 
-  glBegin(model.has_quads ? GL_QUADS : GL_TRIANGLES);
-  for (const auto& v : model.vertices)
+  glBegin(Quads ? GL_QUADS : GL_TRIANGLES);
+  for (const auto& f : model.faces)
   {
-    glColor3ub(v.color.r, v.color.g, v.color.b);
-    glVertex3d(v.pos.x, v.pos.y, v.pos.z);
+    glNormal3d(f.normal.x, f.normal.y, f.normal.z);
+    for (const auto& v : f.vertices)
+    {
+      glColor3ub(v.color.r, v.color.g, v.color.b);
+      glVertex3d(v.pos.x, v.pos.y, v.pos.z);
+    }
   }
   glEnd();
 }
 
 
 
-inline void render_textured(const Model& model, double xr, double yr, double zr)
+template <bool Quads>
+void render_textured(const Model<Quads>& model, double xr, double yr, double zr)
 {
   glLoadIdentity();
   glTranslated(model.cs.o.x, model.cs.o.y, model.cs.o.z);
@@ -61,11 +71,15 @@ inline void render_textured(const Model& model, double xr, double yr, double zr)
   glRotated(yr, 0, 1, 0);
   glRotated(zr, 0, 0, 1);
 
-  glBegin(model.has_quads ? GL_QUADS : GL_TRIANGLES);
-  for (const auto& v : model.vertices)
+  glBegin(Quads ? GL_QUADS : GL_TRIANGLES);
+  for (const auto& f : model.faces)
   {
-    glTexCoord2d(v.tex.x, v.tex.y);
-    glVertex3d(v.pos.x, v.pos.y, v.pos.z);
+    glNormal3d(f.normal.x, f.normal.y, f.normal.z);
+    for (const auto& v : f.vertices)
+    {
+      glTexCoord2d(v.tex.x, v.tex.y);
+      glVertex3d(v.pos.x, v.pos.y, v.pos.z);
+    }
   }
   glEnd();
 }

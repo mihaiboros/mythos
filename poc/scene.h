@@ -2,6 +2,7 @@
 #define __POC_SCENE_H__
 
 #include <cstdint>
+#include <hera/keymap.h>
 #include <hera/light.h>
 #include <hera/model.h>
 
@@ -32,6 +33,12 @@ public:
   void load();
 
   /**
+   * @brief Handle key events
+   * @param keys Key map to use
+   */
+  void handle_keys(const hera::Keymap& keys);
+
+  /**
    * @brief Draw the scene
    */
   void draw();
@@ -39,22 +46,22 @@ public:
 private:
 
   // model out of triangles
-  hera::Model m_tris;
+  hera::tModel m_tris;
   // model out of quads
-  hera::Model m_quads;
+  hera::qModel m_quads;
   // texture id
-  uint32_t m_tex_id{0};
+  uint32_t m_tex[3]{0};
+  uint32_t m_idx{0};
   // has light flag
   bool m_has_light{false};
   bool m_lkey{false};
-  bool m_pkey{false};
+  bool m_fkey{false};
   double m_xr{0};
   double m_yr{0};
   double m_xs{0};
   double m_ys{0};
   double m_zp{-5};
-  hera::Light m_amb;
-  hera::Light m_dif;
+  hera::Light m_light;
 };
 
 } // namespace poc

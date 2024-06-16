@@ -14,7 +14,7 @@ struct Vertex
   // vertex position
   ares::dVec3 pos;
   // vertex color
-  Color color;
+  ubColor color;
   // texture coord
   ares::dVec2 tex;
 };

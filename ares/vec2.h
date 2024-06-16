@@ -12,8 +12,8 @@ template <typename T>
 requires Arithmetic<T>
 struct Vec2;
 
-using iVec2 = Vec2<int32_t>;
 using dVec2 = Vec2<double>;
+using iVec2 = Vec2<int32_t>;
 
 /**
  * @brief Multiplication operator

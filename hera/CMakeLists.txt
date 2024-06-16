@@ -15,6 +15,7 @@ set(
     keymap.h
     light.h
     model.h
+    opengl/light_gl.h
     opengl/model_gl.h
     opengl/sysgl.h
     opengl/texture_gl.h

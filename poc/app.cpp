@@ -15,6 +15,7 @@ void App::execute_frame()
 
   if (!m_win.is_minimized())
   {
+    m_scene.handle_keys(m_keys);
     m_scene.draw();
     m_win.swap_buffers();
   }

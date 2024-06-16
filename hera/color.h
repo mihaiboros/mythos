@@ -1,18 +1,41 @@
 #ifndef __HERA_COLOR_H__
 #define __HERA_COLOR_H__
 
+#include <array>
 #include <cstdint>
 
 namespace hera
 {
 
-struct Color
+template <typename T> struct Color;
+
+using ubColor = Color<uint8_t>;
+using fColor = Color<float>;
+
+template <typename T> struct Color
 {
-  uint8_t r{0};
-  uint8_t g{0};
-  uint8_t b{0};
-  uint8_t a{0};
+  /**
+   * @brief Get color as an array
+   * @return std::array<T, 4> Color array
+   */
+  std::array<T, 4> rgba() const;
+
+  // red
+  T r{0};
+  // green
+  T g{0};
+  // blue
+  T b{0};
+  // alpha
+  T a{0};
 };
+
+
+
+template <typename T> std::array<T, 4> Color<T>::rgba() const
+{
+  return {r, g, b, a};
+}
 
 } // namespace hera
 
