@@ -107,10 +107,8 @@ void Scene::load()
           {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}}}}}};
 
   hera::Image img;
-  img.load("resources/4_store.bmp");
-  m_tex[0] = hera::make_texture(img, hera::Filter::Nearest, hera::Filter::Nearest);
-  m_tex[1] = hera::make_texture(img, hera::Filter::Linear, hera::Filter::Linear);
-  m_tex[2] = hera::make_texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
+  img.load("resources/chapel.png");
+  m_quads.tex = hera::make_texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
 
   m_light = {.pos = {.z = 2},
     .ambient = {.r = 0.3, .g = 0.3, .b = 0.3, .a = 1},
@@ -118,6 +116,9 @@ void Scene::load()
 
   hera::setup_light(m_light, hera::Light_id::Light1);
   hera::enable_light(hera::Light_id::Light1);
+
+  glColor4f(1, 1, 1, 0.5f);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -132,24 +133,34 @@ void Scene::handle_keys(const hera::Keymap& keys)
   {
     m_lkey = true;
     m_has_light = !m_has_light;
-    if (!m_has_light)
-    {
-      glDisable(GL_LIGHTING);
-    }
-    else
+    if (m_has_light)
     {
       glEnable(GL_LIGHTING);
     }
+    else
+    {
+      glDisable(GL_LIGHTING);
+    }
   }
 
-  if (!keys[Key::F])
+  if (!keys[Key::B])
   {
-    m_fkey = false;
+    m_bkey = false;
   }
-  else if (!m_fkey)
+  else if (!m_bkey)
   {
-    m_fkey = true;
-    m_idx = m_idx >= 2 ? 0 : m_idx + 1;
+    m_bkey = true;
+    m_has_blend = !m_has_blend;
+    if (m_has_blend)
+    {
+      glEnable(GL_BLEND);
+      glDisable(GL_DEPTH_TEST);
+    }
+    else
+    {
+      glDisable(GL_BLEND);
+      glEnable(GL_DEPTH_TEST);
+    }
   }
 
   if (keys[Key::Pgdn])
@@ -184,7 +195,7 @@ void Scene::draw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  hera::bind_texture(m_tex[m_idx]);
+  hera::bind_texture(m_quads.tex);
   m_quads.cs.o.z = m_zp;
   hera::render_textured(m_quads, m_xr, m_yr, 0);
 

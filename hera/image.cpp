@@ -29,12 +29,13 @@ Image::~Image() = default;
 bool Image::load(const char* filename)
 {
   int32_t channels{0};
+  stbi_info(filename, &width, &height, &channels);
+  const int32_t desired = 1 == channels ? 3 : 2 == channels ? 4 : channels;
+
   mdata = std::unique_ptr<uint8_t, void (*)(uint8_t*)>(
-    stbi_load(filename, &width, &height, &channels, 0), release_data);
-  if (channels > 0)
-  {
-    format = static_cast<Format>(channels - 1);
-  }
+    stbi_load(filename, &width, &height, &channels, desired), release_data);
+  has_alpha = desired > 3;
+
   return mdata.get();
 }
 

@@ -11,14 +11,6 @@ class Image
 {
 public:
 
-  enum Format
-  {
-    Grey,
-    Grey_alpha,
-    Rgb,
-    Rgba
-  };
-
   /**
    * @brief Construct a new object
    */
@@ -46,8 +38,8 @@ public:
   int32_t width{0};
   // image height
   int32_t height{0};
-  // image format
-  Format format{Grey};
+  // image has alpha
+  bool has_alpha{false};
 
 private:
 

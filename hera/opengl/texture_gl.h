@@ -51,13 +51,25 @@ inline uint32_t make_texture(const Image& img, Filter min, Filter mag)
   if ((Filter::Nearest == min || Filter::Linear == min)
       && (Filter::Nearest == mag || Filter::Linear == mag))
   {
-    glTexImage2D(
-      GL_TEXTURE_2D, 0, 3, img.width, img.height, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data());
+    glTexImage2D(GL_TEXTURE_2D,
+      0,
+      3,
+      img.width,
+      img.height,
+      0,
+      img.has_alpha ? GL_RGBA : GL_RGB,
+      GL_UNSIGNED_BYTE,
+      img.data());
   }
   else
   {
-    gluBuild2DMipmaps(
-      GL_TEXTURE_2D, 3, img.width, img.height, GL_RGB, GL_UNSIGNED_BYTE, img.data());
+    gluBuild2DMipmaps(GL_TEXTURE_2D,
+      3,
+      img.width,
+      img.height,
+      img.has_alpha ? GL_RGBA : GL_RGB,
+      GL_UNSIGNED_BYTE,
+      img.data());
   }
 
   glBindTexture(GL_TEXTURE_2D, 0);

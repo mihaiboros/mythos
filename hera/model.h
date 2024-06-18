@@ -30,6 +30,10 @@ template <bool Quads> struct Model
   ares::dCcs3 cs;
   // model faces
   std::vector<Face> faces;
+  // texture id
+  uint32_t tex{0};
+  // transparent model
+  bool is_transparent{true};
 };
 
 } // namespace hera

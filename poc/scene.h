@@ -49,13 +49,11 @@ private:
   hera::tModel m_tris;
   // model out of quads
   hera::qModel m_quads;
-  // texture id
-  uint32_t m_tex[3]{0};
-  uint32_t m_idx{0};
   // has light flag
   bool m_has_light{false};
   bool m_lkey{false};
-  bool m_fkey{false};
+  bool m_bkey{false};
+  bool m_has_blend{false};
   double m_xr{0};
   double m_yr{0};
   double m_xs{0};
