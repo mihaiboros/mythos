@@ -24,18 +24,27 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ares)
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-    "${CMAKE_CURRENT_SOURCE_DIR}/resources/4_store.png"
-    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/4_store.png"
-)
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/glass.png"
     "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/glass.png"
 )
+
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-    "${CMAKE_CURRENT_SOURCE_DIR}/resources/chapel.png"
-    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/chapel.png"
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/metal.png"
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/metal.png"
+)
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/stained.png"
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/stained.png"
+)
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/wood.png"
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/wood.png"
 )

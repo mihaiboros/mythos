@@ -107,7 +107,7 @@ void Scene::load()
           {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}}}}}};
 
   hera::Image img;
-  img.load("resources/chapel.png");
+  img.load("resources/stained.png");
   m_quads.tex = hera::make_texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
 
   m_light = {.pos = {.z = 2},
