@@ -1,10 +1,9 @@
 #include "scene.h"
 
 #include <hera/image.h>
+#include <hera/opengl/forge.h>
 #include <hera/opengl/light_gl.h>
-#include <hera/opengl/model_gl.h>
 #include <hera/opengl/sysgl.h>
-#include <hera/opengl/texture_gl.h>
 
 namespace
 {
@@ -13,20 +12,20 @@ namespace
  * @brief Make triangle model
  * @return hera::Model Triangle model
  */
-hera::tModel make_tris();
+hera::Model make_tris();
 
 /**
  * @brief Make quad model
  * @return hera::Model Quad model
  */
-hera::qModel make_quads();
+hera::Model make_quads();
 
 /**
  * @brief Renders simple colored models
  * @param tris Triangle model
  * @param quads Quad model
  */
-void render_simple_models(const hera::tModel& tris, const hera::qModel& quads);
+void render_simple_models(const hera::Model& tris, const hera::Model& quads);
 
 } // namespace
 
@@ -69,46 +68,50 @@ void Scene::resize(int32_t width, int32_t height)
 void Scene::load()
 {
   m_quads = {.cs = {.o = {.z = -5}},
-    .faces = {
-      {.normal = {.z = 1},
-        .vertices = {hera::Vertex{.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
-          {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
-          {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
-          {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}}}},
+    .vertices = {{.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
+      {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
+      {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}},
 
-      {.normal = {.z = -1},
-        .vertices = {hera::Vertex{.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
-          {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
-          {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
-          {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}}}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
+      {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
+      {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}},
 
-      {.normal = {.y = 1},
-        .vertices = {hera::Vertex{.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
-          {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 1}},
-          {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 1}},
-          {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}}}},
+      {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
+      {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 1}},
+      {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 1}},
+      {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
 
-      {.normal = {.y = -1},
-        .vertices = {hera::Vertex{.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 0}},
-          {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 0}},
-          {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
-          {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}}}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 0}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 0}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
 
-      {.normal = {.x = 1},
-        .vertices = {hera::Vertex{.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
-          {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
-          {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}},
-          {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}}}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
+      {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
+      {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
 
-      {.normal = {.x = -1},
-        .vertices = {hera::Vertex{.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}},
-          {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
-          {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
-          {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}}}}}};
+      {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
+      {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
+      {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}}},
+    .faces = {{.normal = {.z = 1}},
+      {.normal = {.z = -1}},
+      {.normal = {.y = 1}},
+      {.normal = {.y = -1}},
+      {.normal = {.x = 1}},
+      {.normal = {.x = -1}}},
+    .has_quads = true};
+
+  // m_quads = make_quads();
+  // m_tris = make_tris();
 
   hera::Image img;
   img.load("resources/stained.png");
-  m_quads.tex = hera::make_texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
+  m_quads.tex =
+    hera::forge::make_texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
 
   m_light = {.pos = {.z = 2},
     .ambient = {.r = 0.3, .g = 0.3, .b = 0.3, .a = 1},
@@ -123,7 +126,7 @@ void Scene::load()
 
 
 
-void Scene::handle_keys(const hera::Keymap& keys)
+void Scene::handle_keys(hera::Keymap& keys)
 {
   if (!keys[Key::L])
   {
@@ -165,27 +168,31 @@ void Scene::handle_keys(const hera::Keymap& keys)
 
   if (keys[Key::Pgdn])
   {
-    m_zp -= 0.02;
+    m_zp -= 0.01;
   }
   if (keys[Key::Pgup])
   {
-    m_zp += 0.02;
+    m_zp += 0.01;
   }
   if (keys[Key::Up])
   {
-    m_xs -= 0.01;
+    m_xs -= 0.005;
+    keys[Key::Up] = false;
   }
   if (keys[Key::Down])
   {
-    m_xs += 0.01;
+    m_xs += 0.005;
+    keys[Key::Down] = false;
   }
   if (keys[Key::Right])
   {
-    m_ys += 0.01;
+    m_ys += 0.005;
+    keys[Key::Right] = false;
   }
   if (keys[Key::Left])
   {
-    m_ys -= 0.01;
+    m_ys -= 0.005;
+    keys[Key::Left] = false;
   }
 }
 
@@ -195,12 +202,14 @@ void Scene::draw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  hera::bind_texture(m_quads.tex);
+  m_quads.bind_texture();
   m_quads.cs.o.z = m_zp;
-  hera::render_textured(m_quads, m_xr, m_yr, 0);
+  m_quads.render_textured(m_xr, m_yr, 0);
 
   m_xr += m_xs;
   m_yr += m_ys;
+
+  // render_simple_models(m_tris, m_quads);
 }
 
 } // namespace poc
@@ -210,77 +219,79 @@ void Scene::draw()
 namespace
 {
 
-hera::tModel make_tris()
+hera::Model make_tris()
 {
   return {.cs = {.o = {.x = -1.5, .z = -6}},
-    .faces = {{.vertices = {hera::Vertex{.pos = {.y = 1}, .color = {.r = 255}},
-                 {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.g = 255}},
-                 {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.b = 255}}}},
+    .vertices = {{.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
 
-      {.vertices = {hera::Vertex{.pos = {.y = 1}, .color = {.r = 255}},
-         {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.b = 255}},
-         {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.g = 255}}}},
+      {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
 
-      {.vertices = {hera::Vertex{.pos = {.y = 1}, .color = {.r = 255}},
-         {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.g = 255}},
-         {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.b = 255}}}},
+      {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
 
-      {.vertices = {hera::Vertex{.pos = {.y = 1}, .color = {.r = 255}},
-         {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.b = 255}},
-         {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.g = 255}}}}}};
+      {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}}},
+    .faces = {{}, {}, {}, {}}};
 }
 
 
 
-hera::qModel make_quads()
+hera::Model make_quads()
 {
   return {.cs = {.o = {.x = 1.5, .z = -7}},
-    .faces = {{.vertices = {hera::Vertex{.pos = {.x = 1, .y = 1, .z = -1}, .color = {.g = 255}},
-                 {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.g = 255}},
-                 {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.g = 255}},
-                 {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.g = 255}}}},
+    .vertices = {{.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
+      {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
+      {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
+      {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
 
-      {.vertices = {hera::Vertex{.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128}},
-         {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128}},
-         {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128}},
-         {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128}}}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128, .b = 0}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128, .b = 0}},
 
-      {.vertices = {hera::Vertex{.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255}},
-         {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 255}},
-         {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255}},
-         {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255}}}},
+      {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
 
-      {.vertices = {hera::Vertex{.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255}},
-         {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255}},
-         {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255}},
-         {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255}}}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
+      {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
+      {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
 
-      {.vertices = {hera::Vertex{.pos = {.x = -1, .y = 1, .z = 1}, .color = {.b = 255}},
-         {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.b = 255}},
-         {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.b = 255}},
-         {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.b = 255}}}},
+      {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
+      {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
+      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
+      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
 
-      {.vertices = {hera::Vertex{.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .b = 255}},
-         {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .b = 255}},
-         {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .b = 255}},
-         {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .b = 255}}}}}};
-  return {};
+      {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 0, .b = 255}},
+      {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 255}},
+      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 255}},
+      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 0, .b = 255}}},
+    .faces = {{}, {}, {}, {}, {}, {}},
+    .has_quads = true};
 }
 
 
 
-void render_simple_models(const hera::tModel& tris, const hera::qModel& quads)
+void render_simple_models(const hera::Model& tris, const hera::Model& quads)
 {
   static double tr{0};
   static double qr{0};
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  hera::render_colored(tris, 0, tr, 0);
-  hera::render_colored(quads, qr, qr, qr);
+  tris.render_colored(0, tr, 0);
+  quads.render_colored(qr, qr, qr);
 
-  tr += 0.2;
-  qr -= 0.15;
+  tr += 0.05;
+  qr -= 0.03;
 }
 
 } // namespace

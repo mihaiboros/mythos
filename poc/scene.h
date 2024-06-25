@@ -36,7 +36,7 @@ public:
    * @brief Handle key events
    * @param keys Key map to use
    */
-  void handle_keys(const hera::Keymap& keys);
+  void handle_keys(hera::Keymap& keys);
 
   /**
    * @brief Draw the scene
@@ -46,9 +46,9 @@ public:
 private:
 
   // model out of triangles
-  hera::tModel m_tris;
+  hera::Model m_tris;
   // model out of quads
-  hera::qModel m_quads;
+  hera::Model m_quads;
   // has light flag
   bool m_has_light{false};
   bool m_lkey{false};

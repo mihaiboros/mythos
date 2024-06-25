@@ -15,10 +15,14 @@ set(
     keymap.h
     light.h
     model.h
+    opengl/enums.h
+    opengl/forge.cpp
+    opengl/forge.h
     opengl/light_gl.h
-    opengl/model_gl.h
+    opengl/model.cpp
     opengl/sysgl.h
-    opengl/texture_gl.h
+    opengl/world.cpp
+    opengl/world.h
     vertex.h
     win/keymap.cpp
     win/window.cpp
