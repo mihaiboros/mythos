@@ -1,7 +1,5 @@
 #include "world.h"
 
-#include "sysgl.h"
-
 namespace hera
 {
 
@@ -22,6 +20,7 @@ void World::render(std::span<const Model> opaques, std::span<const Model> transp
     }
   }
 
+  glEnable(GL_BLEND);
   for (const auto& el : transparents)
   {
     if (el.tex != 0)
@@ -34,6 +33,7 @@ void World::render(std::span<const Model> opaques, std::span<const Model> transp
       el.render_colored(0, 0, 0);
     }
   }
+  glDisable(GL_BLEND);
 }
 
 } // namespace hera

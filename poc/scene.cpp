@@ -4,6 +4,7 @@
 #include <hera/opengl/forge.h>
 #include <hera/opengl/light_gl.h>
 #include <hera/opengl/sysgl.h>
+#include <hera/opengl/world.h>
 
 namespace
 {
@@ -35,6 +36,23 @@ namespace poc
 {
 
 using hera::Key;
+
+struct Scene::Renderer
+{
+  hera::World world;
+};
+
+
+
+Scene::Scene() : m_renderer(std::make_unique<Renderer>())
+{
+}
+
+
+
+Scene::~Scene() = default;
+
+
 
 void Scene::init(int32_t width, int32_t height)
 {
@@ -111,7 +129,7 @@ void Scene::load()
   hera::Image img;
   img.load("resources/stained.png");
   m_quads.tex =
-    hera::forge::make_texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
+    hera::forge::texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
 
   m_light = {.pos = {.z = 2},
     .ambient = {.r = 0.3, .g = 0.3, .b = 0.3, .a = 1},
@@ -121,7 +139,7 @@ void Scene::load()
   hera::enable_light(hera::Light_id::Light1);
 
   glColor4f(1, 1, 1, 0.5f);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  m_renderer->world.set_blend_factors(hera::Blend::Src_alpha, hera::Blend::One_minus_src_alpha);
 }
 
 
@@ -200,11 +218,12 @@ void Scene::handle_keys(hera::Keymap& keys)
 
 void Scene::draw()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  m_quads.bind_texture();
   m_quads.cs.o.z = m_zp;
-  m_quads.render_textured(m_xr, m_yr, 0);
+  m_renderer->world.render({}, std::initializer_list<const hera::Model>{m_quads});
+
+  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //  m_quads.bind_texture();
+  //  m_quads.render_textured(m_xr, m_yr, 0);
 
   m_xr += m_xs;
   m_yr += m_ys;

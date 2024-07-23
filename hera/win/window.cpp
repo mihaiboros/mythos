@@ -206,7 +206,7 @@ void Window::Impl::release()
 
 
 Window::Window(const char* title, int32_t width, int32_t height, uint8_t bits)
-  : m_impl(std::make_unique<Window::Impl>())
+  : m_impl(std::make_unique<Impl>())
 {
   if (m_impl->create(title, width, height, bits))
   {

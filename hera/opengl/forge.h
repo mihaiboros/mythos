@@ -3,7 +3,6 @@
 
 #include "../image.h"
 #include "enums.h"
-#include "sysgl.h"
 
 #include <cstdint>
 
@@ -17,7 +16,7 @@ namespace hera::forge
  * @param mag Mag filter
  * @return uint32_t Texture id
  */
-uint32_t make_texture(const Image& img, Filter min, Filter mag);
+uint32_t texture(const Image& img, Filter min, Filter mag);
 
 } // namespace hera::forge
 

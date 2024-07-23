@@ -5,6 +5,7 @@
 #include <hera/keymap.h>
 #include <hera/light.h>
 #include <hera/model.h>
+#include <memory>
 
 namespace poc
 {
@@ -12,6 +13,18 @@ namespace poc
 class Scene
 {
 public:
+
+  struct Renderer;
+
+  /**
+   * @brief Construct a new object
+   */
+  Scene();
+
+  /**
+   * @brief Destroy the object
+   */
+  ~Scene();
 
   /**
    * @brief Initialize the scene
@@ -60,6 +73,8 @@ private:
   double m_ys{0};
   double m_zp{-5};
   hera::Light m_light;
+  // Renderer setup
+  std::unique_ptr<Renderer> m_renderer;
 };
 
 } // namespace poc

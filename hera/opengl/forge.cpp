@@ -3,7 +3,7 @@
 namespace hera::forge
 {
 
-uint32_t make_texture(const Image& img, Filter min, Filter mag)
+uint32_t texture(const Image& img, Filter min, Filter mag)
 {
   uint32_t tex = 0;
 

@@ -2,6 +2,7 @@
 #define __HERA_WORLD_H__
 
 #include "../model.h"
+#include "enums.h"
 
 #include <span>
 
@@ -13,6 +14,13 @@ class World
 public:
 
   /**
+   * @brief Set the blend factors
+   * @param src Source factor
+   * @param dst Destination factor
+   */
+  void set_blend_factors(Blend src, Blend dst);
+
+  /**
    * @brief Render models
    * @param opaques Opaque models
    * @param transparents Transparent models, should be sorted farthest to closest
@@ -21,6 +29,13 @@ public:
 
 private:
 };
+
+
+
+inline void World::set_blend_factors(Blend src, Blend dst)
+{
+  glBlendFunc(static_cast<GLenum>(src), static_cast<GLenum>(dst));
+}
 
 } // namespace hera
 
