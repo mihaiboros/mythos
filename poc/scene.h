@@ -2,6 +2,7 @@
 #define __POC_SCENE_H__
 
 #include <cstdint>
+#include <hera/camera.h>
 #include <hera/keymap.h>
 #include <hera/light.h>
 #include <hera/model.h>
@@ -41,6 +42,13 @@ public:
   void resize(int32_t width, int32_t height);
 
   /**
+   * @brief Handle mouse move events
+   * @param x Cursor x position
+   * @param y Cursor y position
+   */
+  void mouse_move(int x, int y);
+
+  /**
    * @brief Load the scene
    */
   void load();
@@ -59,22 +67,24 @@ public:
 private:
 
   // model out of triangles
-  hera::Model m_tris;
+  hera::Model _tris;
   // model out of quads
-  hera::Model m_quads;
+  hera::Model _quads;
   // has light flag
-  bool m_has_light{false};
-  bool m_lkey{false};
-  bool m_bkey{false};
-  bool m_has_blend{false};
-  double m_xr{0};
-  double m_yr{0};
-  double m_xs{0};
-  double m_ys{0};
-  double m_zp{-5};
-  hera::Light m_light;
+  bool _has_light{false};
+  bool _lkey{false};
+  bool _bkey{false};
+  bool _has_blend{false};
+  double _xr{0};
+  double _yr{0};
+  double _xs{0};
+  double _ys{0};
+  double _zp{-5};
+  hera::Light _light;
   // Renderer setup
-  std::unique_ptr<Renderer> m_renderer;
+  std::unique_ptr<Renderer> _renderer;
+  // World camera
+  hera::Camera _camera;
 };
 
 } // namespace poc

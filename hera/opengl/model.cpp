@@ -1,6 +1,6 @@
 #include "../model.h"
 
-#include "sysgl.h"
+#include "heragl.h"
 
 #include <span>
 
@@ -10,7 +10,7 @@ namespace hera
 void Model::render_colored(double xr, double yr, double zr) const
 {
   glLoadIdentity();
-  glTranslated(cs.o.x, cs.o.y, cs.o.z);
+  glTranslated(cs.origin.x, cs.origin.y, cs.origin.z);
 
   glRotated(xr, 1, 0, 0);
   glRotated(yr, 0, 1, 0);
@@ -38,7 +38,7 @@ void Model::render_colored(double xr, double yr, double zr) const
 void Model::render_textured(double xr, double yr, double zr) const
 {
   glLoadIdentity();
-  glTranslated(cs.o.x, cs.o.y, cs.o.z);
+  glTranslated(cs.origin.x, cs.origin.y, cs.origin.z);
 
   glRotated(xr, 1, 0, 0);
   glRotated(yr, 0, 1, 0);

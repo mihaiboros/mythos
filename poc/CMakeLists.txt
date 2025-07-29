@@ -15,9 +15,6 @@ set(
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
-
-find_package(OpenGL REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::GL OpenGL::GLU)
 target_link_libraries(${PROJECT_NAME} PRIVATE hera)
 target_link_libraries(${PROJECT_NAME} PRIVATE ares)
 

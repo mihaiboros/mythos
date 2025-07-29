@@ -7,10 +7,7 @@ namespace ares
 {
 
 template <typename T>
-concept Arithmetic = std::is_arithmetic_v<T>;
-
-template <typename T>
-concept Floating_point = std::is_floating_point_v<T>;
+concept arithmetic = std::is_arithmetic_v<T>;
 
 } // namespace ares
 

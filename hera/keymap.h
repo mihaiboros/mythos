@@ -132,39 +132,64 @@ public:
   Keymap();
 
   /**
-   * @brief Indexer operator to get key state
-   * @param sys_key System key id to get
-   * @return bool& Key state
+   * @brief Set the key state
+   * @param sys_key System key id
+   * @param pressed Pressed state
    */
-  bool& operator[](uint8_t sys_key);
+  void set_key(uint8_t sys_key, bool pressed);
 
   /**
-   * @brief Indexer operator to get key state
-   * @param key Name of the key to get
-   * @return bool& Key state
+   * @brief Set the key state
+   * @param key Key name
+   * @param pressed Pressed state
    */
-  bool& operator[](Key::Alnum key);
+  void set_key(Key::Alnum key, bool pressed);
 
   /**
-   * @brief Indexer operator to get key state
-   * @param key Name of the key to get
-   * @return const bool& Key state
+   * @brief Set the key state
+   * @param key Key name
+   * @param pressed Pressed state
    */
-  const bool& operator[](Key::Alnum key) const;
+  void set_key(Key::Special key, bool pressed);
 
   /**
-   * @brief Indexer operator to get key state
-   * @param key Name of the key to get
-   * @return bool& Key state
+   * @brief Check if key is pressed
+   * @param sys_key System key id
+   * @return Key state
    */
-  bool& operator[](Key::Special key);
+  bool is_pressed(uint8_t sys_key) const;
 
   /**
-   * @brief Indexer operator to get key state
-   * @param key Name of the key to get
-   * @return const bool& Key state
+   * @brief Check if key is pressed
+   * @param key Key name
+   * @return Key state
    */
-  const bool& operator[](Key::Special key) const;
+  bool is_pressed(Key::Alnum key) const;
+
+  /**
+   * @brief Check if key is pressed
+   * @param key Key name
+   * @return Key state
+   */
+  bool is_pressed(Key::Special key) const;
+
+  /**
+   * @brief Release key
+   * @param sys_key System key id
+   */
+  void release(uint8_t sys_key);
+
+  /**
+   * @brief Release key
+   * @param key Key name
+   */
+  void release(Key::Alnum key);
+
+  /**
+   * @brief Release key
+   * @param key Key name
+   */
+  void release(Key::Special key);
 
 private:
 
@@ -181,37 +206,63 @@ private:
 
 
 
-inline bool& Keymap::operator[](uint8_t sys_key)
+inline void Keymap::set_key(uint8_t sys_key, bool pressed)
+{
+  m_state[sys_key] = pressed;
+}
+
+
+inline void Keymap::set_key(Key::Alnum key, bool pressed)
+{
+  m_state[key] = pressed;
+}
+
+
+
+inline void Keymap::set_key(Key::Special key, bool pressed)
+{
+  m_state[m_names[key]] = pressed;
+}
+
+
+
+inline bool Keymap::is_pressed(uint8_t sys_key) const
 {
   return m_state[sys_key];
 }
 
 
 
-inline bool& Keymap::operator[](Key::Alnum key)
+inline bool Keymap::is_pressed(Key::Alnum key) const
 {
   return m_state[key];
 }
 
 
 
-inline const bool& Keymap::operator[](Key::Alnum key) const
-{
-  return m_state[key];
-}
-
-
-
-inline bool& Keymap::operator[](Key::Special key)
+inline bool Keymap::is_pressed(Key::Special key) const
 {
   return m_state[m_names[key]];
 }
 
 
 
-inline const bool& Keymap::operator[](Key::Special key) const
+inline void Keymap::release(uint8_t sys_key)
 {
-  return m_state[m_names[key]];
+  m_state[sys_key] = false;
+}
+
+
+inline void Keymap::release(Key::Alnum key)
+{
+  m_state[key] = false;
+}
+
+
+
+inline void Keymap::release(Key::Special key)
+{
+  m_state[m_names[key]] = false;
 }
 
 } // namespace hera

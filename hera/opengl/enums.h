@@ -1,7 +1,7 @@
 #ifndef __HERA_ENUMS_H__
 #define __HERA_ENUMS_H__
 
-#include "sysgl.h"
+#include "heragl.h"
 
 namespace hera
 {

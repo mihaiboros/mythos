@@ -11,21 +11,24 @@ class Window
 {
 public:
 
+  // window os specific implementation
   struct Impl;
 
   /**
    * @brief Create the object
-   * @param title Window title
-   * @param width Window width
-   * @param height Window height
-   * @param bits Color bits 16/24/32
    */
-  Window(const char* title, int32_t width, int32_t height, uint8_t bits);
+  Window();
 
   /**
    * @brief Destroy the object
    */
   ~Window();
+
+  /**
+   * @brief Set the window implemetnation
+   * @param impl Implemetnation to set
+   */
+  void set_impl(std::unique_ptr<Impl> impl);
 
   /**
    * @brief Swap window buffer at the end of a draw
@@ -47,22 +50,19 @@ public:
    */
   void set_windowed();
 
-  /**
-   * @brief Check if window is minimized
-   * @return bool Result of check
-   */
-  bool is_minimized() const;
-
-  /**
-   * @brief Check if the window is valid
-   * @return bool Result of check
-   */
-  bool is_valid() const;
+  // window is minimized
+  bool is_minimized{false};
+  // window is fullscreen
+  bool is_fullscreen{false};
+  // window actual width
+  int32_t width{0};
+  // window actual height
+  int32_t height{0};
 
 private:
 
   // Window implementation
-  std::unique_ptr<Impl> m_impl;
+  std::unique_ptr<Impl> _impl;
 };
 
 } // namespace hera

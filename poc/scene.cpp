@@ -1,9 +1,11 @@
 #include "scene.h"
 
+#include <hera/camera.h>
+#include <hera/engine.h>
 #include <hera/image.h>
 #include <hera/opengl/forge.h>
+#include <hera/opengl/heragl.h>
 #include <hera/opengl/light_gl.h>
-#include <hera/opengl/sysgl.h>
 #include <hera/opengl/world.h>
 
 namespace
@@ -44,7 +46,7 @@ struct Scene::Renderer
 
 
 
-Scene::Scene() : m_renderer(std::make_unique<Renderer>())
+Scene::Scene() : _renderer(std::make_unique<Renderer>())
 {
 }
 
@@ -56,14 +58,7 @@ Scene::~Scene() = default;
 
 void Scene::init(int32_t width, int32_t height)
 {
-  glShadeModel(GL_SMOOTH);
-  glClearColor(0, 0, 0, 0.5);
-  glClearDepth(1);
-
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LEQUAL);
-  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
+  hera::engine.renderer.basic_scene_setup();
   resize(width, height);
 }
 
@@ -71,21 +66,25 @@ void Scene::init(int32_t width, int32_t height)
 
 void Scene::resize(int32_t width, int32_t height)
 {
-  glViewport(0, 0, width, height > 0 ? height : 1);
+  hera::engine.renderer.set_viewport(0, 0, width, height);
+  const double aspect = double(width) / height;
+  hera::engine.renderer.set_perspective(false, 45, aspect, 0.1, 100);
+  _camera.set_window_center(width / 2, height / 2);
+  _camera.set_perspective(45, aspect, 0.1, 100);
+}
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(45, static_cast<double>(width) / height, 0.1, 100);
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+
+void Scene::mouse_move(int x, int y)
+{
+  hera::engine.point_camera(_camera, x, y);
 }
 
 
 
 void Scene::load()
 {
-  m_quads = {.cs = {.o = {.z = -5}},
+  _quads = {.cs = {.origin = {.z = -5}},
     .vertices = {{.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
       {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
       {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
@@ -123,38 +122,37 @@ void Scene::load()
       {.normal = {.x = -1}}},
     .has_quads = true};
 
-  // m_quads = make_quads();
-  // m_tris = make_tris();
+  //_quads = make_quads();
+  //_tris = make_tris();
 
   hera::Image img;
   img.load("resources/stained.png");
-  m_quads.tex =
-    hera::forge::texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
+  _quads.tex = hera::forge::texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
 
-  m_light = {.pos = {.z = 2},
+  _light = {.pos = {.z = 2},
     .ambient = {.r = 0.3, .g = 0.3, .b = 0.3, .a = 1},
     .diffuse = {.r = 1, .g = 1, .b = 1, .a = 1}};
 
-  hera::setup_light(m_light, hera::Light_id::Light1);
+  hera::setup_light(_light, hera::Light_id::Light1);
   hera::enable_light(hera::Light_id::Light1);
 
   glColor4f(1, 1, 1, 0.5f);
-  m_renderer->world.set_blend_factors(hera::Blend::Src_alpha, hera::Blend::One_minus_src_alpha);
+  _renderer->world.set_blend_factors(hera::Blend::Src_alpha, hera::Blend::One_minus_src_alpha);
 }
 
 
 
 void Scene::handle_keys(hera::Keymap& keys)
 {
-  if (!keys[Key::L])
+  if (!keys.is_pressed(Key::L))
   {
-    m_lkey = false;
+    _lkey = false;
   }
-  else if (!m_lkey)
+  else if (!_lkey)
   {
-    m_lkey = true;
-    m_has_light = !m_has_light;
-    if (m_has_light)
+    _lkey = true;
+    _has_light = !_has_light;
+    if (_has_light)
     {
       glEnable(GL_LIGHTING);
     }
@@ -164,15 +162,15 @@ void Scene::handle_keys(hera::Keymap& keys)
     }
   }
 
-  if (!keys[Key::B])
+  if (!keys.is_pressed(Key::B))
   {
-    m_bkey = false;
+    _bkey = false;
   }
-  else if (!m_bkey)
+  else if (!_bkey)
   {
-    m_bkey = true;
-    m_has_blend = !m_has_blend;
-    if (m_has_blend)
+    _bkey = true;
+    _has_blend = !_has_blend;
+    if (_has_blend)
     {
       glEnable(GL_BLEND);
       glDisable(GL_DEPTH_TEST);
@@ -184,33 +182,75 @@ void Scene::handle_keys(hera::Keymap& keys)
     }
   }
 
-  if (keys[Key::Pgdn])
+  if (keys.is_pressed(Key::Pgdn))
   {
-    m_zp -= 0.01;
+    _zp -= 0.01;
   }
-  if (keys[Key::Pgup])
+  if (keys.is_pressed(Key::Pgup))
   {
-    m_zp += 0.01;
+    _zp += 0.01;
   }
-  if (keys[Key::Up])
+  if (keys.is_pressed(Key::Up))
   {
-    m_xs -= 0.005;
-    keys[Key::Up] = false;
+    _xs -= 0.005;
+    keys.release(Key::Up);
   }
-  if (keys[Key::Down])
+  if (keys.is_pressed(Key::Down))
   {
-    m_xs += 0.005;
-    keys[Key::Down] = false;
+    _xs += 0.005;
+    keys.release(Key::Down);
   }
-  if (keys[Key::Right])
+  if (keys.is_pressed(Key::Right))
   {
-    m_ys += 0.005;
-    keys[Key::Right] = false;
+    _ys += 0.005;
+    keys.release(Key::Right);
   }
-  if (keys[Key::Left])
+  if (keys.is_pressed(Key::Left))
   {
-    m_ys -= 0.005;
-    keys[Key::Left] = false;
+    _ys -= 0.005;
+    keys.release(Key::Left);
+  }
+
+  const double move_speed = 0.005;
+  if (keys.is_pressed(Key::E))
+  {
+    _camera.advance(move_speed);
+  }
+
+  if (keys.is_pressed(Key::D))
+  {
+    _camera.advance(-move_speed);
+  }
+
+  if (keys.is_pressed(Key::S))
+  {
+    _camera.strafe(-move_speed);
+  }
+
+  if (keys.is_pressed(Key::F))
+  {
+    _camera.strafe(move_speed);
+  }
+
+  if (keys.is_pressed(Key::R))
+  {
+    _camera.ascend(move_speed);
+  }
+
+  if (keys.is_pressed(Key::C))
+  {
+    _camera.ascend(-move_speed);
+  }
+
+  const double roll_speed = 0.001;
+  if (keys.is_pressed(Key::Q))
+  {
+    _camera.roll(-roll_speed);
+  }
+
+  if (keys.is_pressed(Key::W))
+  {
+    _camera.roll(roll_speed);
   }
 }
 
@@ -218,17 +258,30 @@ void Scene::handle_keys(hera::Keymap& keys)
 
 void Scene::draw()
 {
-  m_quads.cs.o.z = m_zp;
-  m_renderer->world.render({}, std::initializer_list<const hera::Model>{m_quads});
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  hera::engine.renderer.look_at(
+    _camera.position(), _camera.position() + _camera.cs().x_axis, _camera.cs().y_axis);
+
+  //_quads.cs.origin.z = _zp;
+  //_renderer->world.render({}, std::initializer_list<const hera::Model>{_quads});
 
   // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //  m_quads.bind_texture();
-  //  m_quads.render_textured(m_xr, m_yr, 0);
+  //_quads.bind_texture();
+  //_quads.render_textured(_xr, _yr, 0);
 
-  m_xr += m_xs;
-  m_yr += m_ys;
+  //_xr += _xs;
+  //_yr += _ys;
 
-  // render_simple_models(m_tris, m_quads);
+  // render_simple_models(_tris, _quads);
+
+
+  glBegin(GL_QUADS);
+  glVertex3d(-0.5, -0.5, -3);
+  glVertex3d(-0.5, 0.5, -3);
+  glVertex3d(0.5, 0.5, -3);
+  glVertex3d(0.5, -0.5, -3);
+  glEnd();
 }
 
 } // namespace poc
@@ -240,7 +293,7 @@ namespace
 
 hera::Model make_tris()
 {
-  return {.cs = {.o = {.x = -1.5, .z = -6}},
+  return {.cs = {.origin = {.x = -1.5, .z = -6}},
     .vertices = {{.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
       {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
       {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
@@ -263,7 +316,7 @@ hera::Model make_tris()
 
 hera::Model make_quads()
 {
-  return {.cs = {.o = {.x = 1.5, .z = -7}},
+  return {.cs = {.origin = {.x = 1.5, .z = -7}},
     .vertices = {{.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
       {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
       {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},

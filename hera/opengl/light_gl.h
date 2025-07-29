@@ -2,7 +2,7 @@
 #define __HERA_LIGHT_GL_H__
 
 #include "../light.h"
-#include "sysgl.h"
+#include "heragl.h"
 
 #include <cstdint>
 

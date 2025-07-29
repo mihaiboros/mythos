@@ -1,5 +1,5 @@
-#ifndef __SYSGL_H__
-#define __SYSGL_H__
+#ifndef __WINGL_H__
+#define __WINGL_H__
 
 // Windows defines
 #ifndef WINGDIAPI
@@ -17,4 +17,6 @@
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
-#endif //__SYSGL_H__
+// TODO extensions
+
+#endif //__WINGL_H__

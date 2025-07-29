@@ -4,7 +4,7 @@
 #include "color.h"
 #include "vertex.h"
 
-#include <ares/ccs3.h>
+#include <ares/cs3.h>
 #include <vector>
 
 namespace hera
@@ -40,7 +40,7 @@ struct Model
   void bind_texture() const;
 
   // local coordinate system
-  ares::dCcs3 cs;
+  ares::dCs3 cs;
   // model vertices
   std::vector<Vertex> vertices;
   // model faces

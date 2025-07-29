@@ -7,11 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(
     SOURCE_FILES
-    ccs3.h
     concepts.h
+    cs3.h
+    epsilon.h
+    frustum.h
+    matrix.h
+    plane.h
     vec2.h
     vec3.h
 )
 
 add_library(${PROJECT_NAME} INTERFACE ${SOURCE_FILES})
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} INTERFACE "${CMAKE_SOURCE_DIR}")
