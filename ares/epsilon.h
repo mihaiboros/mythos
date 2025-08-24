@@ -22,8 +22,7 @@ constexpr double deps = DEPS;
  * @param val Value to check
  * @return bool Result of check
  */
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool zero(T val);
 
 /**
@@ -32,8 +31,7 @@ constexpr bool zero(T val);
  * @param val Value to check
  * @return bool Result of check
  */
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool nzero(T val);
 
 /**
@@ -44,8 +42,7 @@ constexpr bool nzero(T val);
  * @param rhs Right hand side value
  * @return bool Result of check
  */
-template <typename T, typename U>
-requires arithmetic<T> && arithmetic<U>
+template <arithmetic T, arithmetic U>
 constexpr bool eq(T lhs, U rhs);
 
 /**
@@ -56,14 +53,12 @@ constexpr bool eq(T lhs, U rhs);
  * @param rhs Right hand side value
  * @return bool Result of check
  */
-template <typename T, typename U>
-requires arithmetic<T> && arithmetic<U>
+template <arithmetic T, arithmetic U>
 constexpr bool neq(T lhs, U rhs);
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool zero(T val)
 {
   if constexpr (std::is_floating_point_v<T>)
@@ -78,8 +73,7 @@ constexpr bool zero(T val)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool nzero(T val)
 {
   return !zero(val);
@@ -87,8 +81,7 @@ constexpr bool nzero(T val)
 
 
 
-template <typename T, typename U>
-requires arithmetic<T> && arithmetic<U>
+template <arithmetic T, arithmetic U>
 constexpr bool eq(T lhs, U rhs)
 {
   return zero(lhs - rhs);
@@ -96,8 +89,7 @@ constexpr bool eq(T lhs, U rhs)
 
 
 
-template <typename T, typename U>
-requires arithmetic<T> && arithmetic<U>
+template <arithmetic T, arithmetic U>
 constexpr bool neq(T lhs, U rhs)
 {
   return !eq(lhs, rhs);

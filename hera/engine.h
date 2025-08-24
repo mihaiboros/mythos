@@ -34,12 +34,18 @@ public:
   bool create_window(const char* title, int32_t width, int32_t height, uint8_t bits);
 
   /**
-   * @brief Rotate the camera to point at the specified window coordinates
-   * @param cam Camera to rotate
+   * @brief Point camera at the specified window coordinates
+   * @param cam Camera to point
    * @param winx X window coordinate to be mapped
    * @param winy Y window coordinate to be mapped
    */
   void point_camera(Camera& cam, int32_t winx, int32_t winy);
+
+  /**
+   * @brief Set camera in scene
+   * @param cam Camera to set
+   */
+  void set_camera(const Camera& cam);
 
   /**
    * @brief Peek OS events and continue if no quit received
@@ -81,7 +87,7 @@ private:
   // singleton engine instance
   inline static std::unique_ptr<Engine> _inst{std::make_unique<Engine>()};
   // mouse windows coordinates
-  ares::iVec2 _win_coords;
+  ares::ivec2 _win_coords;
 };
 
 static Engine& engine{Engine::instance()};
@@ -105,6 +111,13 @@ inline void Engine::point_camera(Camera& cam, int32_t winx, int32_t winy)
     cam.point_at(pos);
     set_cursor(cam.center.x, cam.center.y);
   }
+}
+
+
+
+inline void Engine::set_camera(const Camera& cam)
+{
+  renderer.look_at(cam.position(), cam.position() + cam.cs().x_axis, cam.cs().y_axis);
 }
 
 } // namespace hera

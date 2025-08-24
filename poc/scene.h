@@ -3,9 +3,10 @@
 
 #include <cstdint>
 #include <hera/camera.h>
+#include <hera/glass_parts.h>
 #include <hera/keymap.h>
 #include <hera/light.h>
-#include <hera/model.h>
+#include <hera/solid_parts.h>
 #include <memory>
 
 namespace poc
@@ -14,18 +15,6 @@ namespace poc
 class Scene
 {
 public:
-
-  struct Renderer;
-
-  /**
-   * @brief Construct a new object
-   */
-  Scene();
-
-  /**
-   * @brief Destroy the object
-   */
-  ~Scene();
 
   /**
    * @brief Initialize the scene
@@ -60,29 +49,24 @@ public:
   void handle_keys(hera::Keymap& keys);
 
   /**
-   * @brief Draw the scene
+   * @brief Render the scene
    */
-  void draw();
+  void render();
 
 private:
 
-  // model out of triangles
-  hera::Model _tris;
-  // model out of quads
-  hera::Model _quads;
+  // object parts
+  hera::Glass_parts _glassy;
+  hera::Solid_parts _solids;
   // has light flag
   bool _has_light{false};
   bool _lkey{false};
-  bool _bkey{false};
-  bool _has_blend{false};
   double _xr{0};
   double _yr{0};
   double _xs{0};
   double _ys{0};
   double _zp{-5};
   hera::Light _light;
-  // Renderer setup
-  std::unique_ptr<Renderer> _renderer;
   // World camera
   hera::Camera _camera;
 };

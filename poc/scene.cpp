@@ -1,34 +1,26 @@
 #include "scene.h"
 
+#include <ares/matrix.h>
 #include <hera/camera.h>
 #include <hera/engine.h>
 #include <hera/image.h>
-#include <hera/opengl/forge.h>
 #include <hera/opengl/heragl.h>
 #include <hera/opengl/light_gl.h>
-#include <hera/opengl/world.h>
 
 namespace
 {
 
 /**
- * @brief Make triangle model
- * @return hera::Model Triangle model
+ * @brief Add a colored piramid
+ * @param solids Solid parts to add to
  */
-hera::Model make_tris();
+void add_piramid(hera::Solid_parts& solids);
 
 /**
- * @brief Make quad model
- * @return hera::Model Quad model
+ * @brief Add a colored cube
+ * @param solids Solid parts to add to
  */
-hera::Model make_quads();
-
-/**
- * @brief Renders simple colored models
- * @param tris Triangle model
- * @param quads Quad model
- */
-void render_simple_models(const hera::Model& tris, const hera::Model& quads);
+void add_cube(hera::Solid_parts& solids);
 
 } // namespace
 
@@ -36,25 +28,6 @@ void render_simple_models(const hera::Model& tris, const hera::Model& quads);
 
 namespace poc
 {
-
-using hera::Key;
-
-struct Scene::Renderer
-{
-  hera::World world;
-};
-
-
-
-Scene::Scene() : _renderer(std::make_unique<Renderer>())
-{
-}
-
-
-
-Scene::~Scene() = default;
-
-
 
 void Scene::init(int32_t width, int32_t height)
 {
@@ -84,66 +57,67 @@ void Scene::mouse_move(int x, int y)
 
 void Scene::load()
 {
-  _quads = {.cs = {.origin = {.z = -5}},
-    .vertices = {{.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
-      {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
-      {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}},
-
-      {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
-      {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
-      {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
-      {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}},
-
-      {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
-      {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 1}},
-      {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 1}},
-      {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
-
-      {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 0}},
-      {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 0}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
-
-      {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
-      {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
-      {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
-
-      {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
-      {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
-      {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}}},
-    .faces = {{.normal = {.z = 1}},
-      {.normal = {.z = -1}},
-      {.normal = {.y = 1}},
-      {.normal = {.y = -1}},
-      {.normal = {.x = 1}},
-      {.normal = {.x = -1}}},
-    .has_quads = true};
-
-  //_quads = make_quads();
-  //_tris = make_tris();
-
   hera::Image img;
   img.load("resources/stained.png");
-  _quads.tex = hera::forge::texture(img, hera::Filter::Linear, hera::Filter::Linear_mipmap_nearest);
+  const auto tex = hera::engine.renderer.create_texture(
+    img, hera::Texture::Min::Linear_mipmap_nearest, hera::Texture::Mag::Linear);
+  const hera::Blend blend{.src = hera::Blend::Src_alpha, .dst = hera::Blend::One_minus_src_alpha};
 
-  _light = {.pos = {.z = 2},
+  _glassy.add_part(tex, blend, {.origin = {.z = -5}});
+  _glassy.add_face(
+    {.z = 1},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
+    {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
+    {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}});
+  _glassy.add_face(
+    {.z = -1},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
+    {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
+    {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}});
+  _glassy.add_face(
+    {.y = 1},
+    {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}},
+    {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 1}},
+    {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 1}},
+    {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}});
+  _glassy.add_face(
+    {.y = -1},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 0}},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 0}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}});
+  _glassy.add_face(
+    {.x = 1},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .tex = {.x = 1, .y = 1}},
+    {.pos = {.x = 1, .y = 1, .z = -1}, .tex = {.x = 1, .y = 0}},
+    {.pos = {.x = 1, .y = 1, .z = 1}, .tex = {.x = 0, .y = 0}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .tex = {.x = 0, .y = 1}});
+  _glassy.add_face(
+    {.x = -1},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .tex = {.x = 0, .y = 1}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .tex = {.x = 1, .y = 1}},
+    {.pos = {.x = -1, .y = 1, .z = 1}, .tex = {.x = 1, .y = 0}},
+    {.pos = {.x = -1, .y = 1, .z = -1}, .tex = {.x = 0, .y = 0}});
+
+  add_piramid(_solids);
+  add_cube(_solids);
+
+  _light = {
+    .pos = {.z = 2},
     .ambient = {.r = 0.3, .g = 0.3, .b = 0.3, .a = 1},
     .diffuse = {.r = 1, .g = 1, .b = 1, .a = 1}};
 
   hera::setup_light(_light, hera::Light_id::Light1);
   hera::enable_light(hera::Light_id::Light1);
-
-  glColor4f(1, 1, 1, 0.5f);
-  _renderer->world.set_blend_factors(hera::Blend::Src_alpha, hera::Blend::One_minus_src_alpha);
 }
 
 
 
 void Scene::handle_keys(hera::Keymap& keys)
 {
+  using hera::Key;
   if (!keys.is_pressed(Key::L))
   {
     _lkey = false;
@@ -159,26 +133,6 @@ void Scene::handle_keys(hera::Keymap& keys)
     else
     {
       glDisable(GL_LIGHTING);
-    }
-  }
-
-  if (!keys.is_pressed(Key::B))
-  {
-    _bkey = false;
-  }
-  else if (!_bkey)
-  {
-    _bkey = true;
-    _has_blend = !_has_blend;
-    if (_has_blend)
-    {
-      glEnable(GL_BLEND);
-      glDisable(GL_DEPTH_TEST);
-    }
-    else
-    {
-      glDisable(GL_BLEND);
-      glEnable(GL_DEPTH_TEST);
     }
   }
 
@@ -256,32 +210,22 @@ void Scene::handle_keys(hera::Keymap& keys)
 
 
 
-void Scene::draw()
+void Scene::render()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-  hera::engine.renderer.look_at(
-    _camera.position(), _camera.position() + _camera.cs().x_axis, _camera.cs().y_axis);
+  hera::engine.renderer.basic_start_scene();
+  hera::engine.set_camera(_camera);
 
-  //_quads.cs.origin.z = _zp;
-  //_renderer->world.render({}, std::initializer_list<const hera::Model>{_quads});
-
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //_quads.bind_texture();
-  //_quads.render_textured(_xr, _yr, 0);
-
-  //_xr += _xs;
-  //_yr += _ys;
-
-  // render_simple_models(_tris, _quads);
-
-
+  glBindTexture(GL_TEXTURE_2D, 0);
   glBegin(GL_QUADS);
-  glVertex3d(-0.5, -0.5, -3);
-  glVertex3d(-0.5, 0.5, -3);
-  glVertex3d(0.5, 0.5, -3);
-  glVertex3d(0.5, -0.5, -3);
+  glColor4ub(255, 255, 255, 255);
+  glVertex3d(-0.5, -0.5, -13);
+  glVertex3d(-0.5, 0.5, -13);
+  glVertex3d(0.5, 0.5, -13);
+  glVertex3d(0.5, -0.5, -13);
   glEnd();
+
+  _glassy.sort_by_depth(_camera.cs().x_axis);
+  hera::engine.renderer.render_parts(_solids, _glassy);
 }
 
 } // namespace poc
@@ -291,79 +235,72 @@ void Scene::draw()
 namespace
 {
 
-hera::Model make_tris()
+void add_piramid(hera::Solid_parts& solids)
 {
-  return {.cs = {.origin = {.x = -1.5, .z = -6}},
-    .vertices = {{.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
-
-      {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
-      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
-
-      {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
-
-      {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}}},
-    .faces = {{}, {}, {}, {}}};
+  solids.add_part({}, {.origin = {.x = -1.5, .y = 0, .z = -9}});
+  solids.add_face(
+    {},
+    {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}});
+  solids.add_face(
+    {},
+    {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}});
+  solids.add_face(
+    {},
+    {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}});
+  solids.add_face(
+    {},
+    {.pos = {.y = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}});
 }
 
 
 
-hera::Model make_quads()
+void add_cube(hera::Solid_parts& solids)
 {
-  return {.cs = {.origin = {.x = 1.5, .z = -7}},
-    .vertices = {{.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
-      {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
-      {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
-      {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
-
-      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128, .b = 0}},
-      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128, .b = 0}},
-
-      {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
-
-      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
-      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
-      {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
-      {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
-
-      {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
-      {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
-      {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
-      {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
-
-      {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 0, .b = 255}},
-      {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 255}},
-      {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 255}},
-      {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 0, .b = 255}}},
-    .faces = {{}, {}, {}, {}, {}, {}},
-    .has_quads = true};
-}
-
-
-
-void render_simple_models(const hera::Model& tris, const hera::Model& quads)
-{
-  static double tr{0};
-  static double qr{0};
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  tris.render_colored(0, tr, 0);
-  quads.render_colored(qr, qr, qr);
-
-  tr += 0.05;
-  qr -= 0.03;
+  solids.add_part({}, {.origin = {.x = 1.5, .y = 0, .z = -9}});
+  solids.add_face(
+    {.y = 1},
+    {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
+    {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 255, .b = 0}},
+    {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}},
+    {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 0, .g = 255, .b = 0}});
+  solids.add_face(
+    {.y = -1},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 128, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128, .b = 0}},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 128, .b = 0}});
+  solids.add_face(
+    {.z = 1},
+    {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 0}});
+  solids.add_face(
+    {.z = -1},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
+    {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}},
+    {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 255, .b = 0}});
+  solids.add_face(
+    {.x = -1},
+    {.pos = {.x = -1, .y = 1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}},
+    {.pos = {.x = -1, .y = 1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
+    {.pos = {.x = -1, .y = -1, .z = -1}, .color = {.r = 0, .g = 0, .b = 255}},
+    {.pos = {.x = -1, .y = -1, .z = 1}, .color = {.r = 0, .g = 0, .b = 255}});
+  solids.add_face(
+    {.x = 1},
+    {.pos = {.x = 1, .y = 1, .z = -1}, .color = {.r = 255, .g = 0, .b = 255}},
+    {.pos = {.x = 1, .y = 1, .z = 1}, .color = {.r = 255, .g = 0, .b = 255}},
+    {.pos = {.x = 1, .y = -1, .z = 1}, .color = {.r = 255, .g = 0, .b = 255}},
+    {.pos = {.x = 1, .y = -1, .z = -1}, .color = {.r = 255, .g = 0, .b = 255}});
 }
 
 } // namespace

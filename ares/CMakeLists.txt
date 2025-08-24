@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(
     SOURCE_FILES
+    bbox3.h
     concepts.h
     cs3.h
     epsilon.h

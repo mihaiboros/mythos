@@ -1,4 +1,4 @@
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: AlwaysBreak
 AlignArrayOfStructures: None
 AlignConsecutiveBitFields: AcrossEmptyLines
 AlignOperands: AlignAfterOperator
@@ -17,7 +17,7 @@ AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakBeforeMultilineStrings: true
 BinPackArguments: false
-BinPackParameters: false
+BinPackParameters: OnePerLine
 BitFieldColonSpacing: Both
 BreakAfterReturnType: Automatic
 BreakBeforeBinaryOperators: NonAssignment
@@ -55,6 +55,7 @@ MainIncludeChar: Quote
 MaxEmptyLinesToKeep: 3
 NamespaceIndentation: None
 PackConstructorInitializers: CurrentLine
+PenaltyReturnTypeOnItsOwnLine: 120
 PointerAlignment: Left
 QualifierAlignment: Left
 ReferenceAlignment: Left

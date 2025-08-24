@@ -20,7 +20,7 @@ struct Frustum
    * @param near Near distance
    * @param far Far distance
    */
-  static Frustum make(const dCs3& cs, double fov, double ratio, double near, double far);
+  static Frustum make(const dcs3& cs, double fov, double ratio, double near, double far);
 
   /**
    * @brief Compute field of view half angle tangent
@@ -43,7 +43,7 @@ struct Frustum
    * @param point Point to check
    * @return bool Result of check
    */
-  constexpr bool contains(const dVec3& point) const;
+  constexpr bool contains(const dvec3& point) const;
 
   /**
    * @brief Compute frustum planes
@@ -52,7 +52,7 @@ struct Frustum
   constexpr std::array<Plane, 6> compute_planes() const;
 
   // Coordinate system
-  dCs3 cs;
+  dcs3 cs;
   // Field of view half angle tangent
   double fov_htan{0};
   // Aspect ratio
@@ -65,7 +65,7 @@ struct Frustum
 
 
 
-inline Frustum Frustum::make(const dCs3& cs, double fov, double ratio, double near, double far)
+inline Frustum Frustum::make(const dcs3& cs, double fov, double ratio, double near, double far)
 {
   return {.cs = cs, .fov_htan = from_fov(fov), .ratio = ratio, .near = near, .far = far};
 }
@@ -89,11 +89,11 @@ inline void Frustum::set_perspective(double fov, double ratio, double near, doub
 
 
 
-inline constexpr bool Frustum::contains(const dVec3& point) const
+inline constexpr bool Frustum::contains(const dvec3& point) const
 {
   bool result = false;
 
-  const dVec3 v = point - cs.origin;
+  const dvec3 v = point - cs.origin;
   const double x = v.dot(cs.x_axis);
 
   if (near <= x && x <= far)
@@ -117,12 +117,12 @@ inline constexpr bool Frustum::contains(const dVec3& point) const
 
 inline constexpr std::array<Plane, 6> Frustum::compute_planes() const
 {
-  const dVec3 near_center = cs.origin + cs.x_axis * near;
+  const dvec3 near_center = cs.origin + cs.x_axis * near;
   const double half_hnear = fov_htan * near;
   const double half_wnear = half_hnear * ratio;
-  const dVec3 front = near_center - cs.origin;
-  const dVec3 up = cs.y_axis * half_hnear;
-  const dVec3 right = cs.z_axis * half_wnear;
+  const dvec3 front = near_center - cs.origin;
+  const dvec3 up = cs.y_axis * half_hnear;
+  const dvec3 right = cs.z_axis * half_wnear;
 
   return {Plane{near_center, cs.x_axis},           // near plane
     {cs.origin + cs.x_axis * far, cs.x_axis * -1}, // far plane

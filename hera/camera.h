@@ -13,31 +13,31 @@ struct Camera
    * @brief Get camera coordinate system
    * @return Coordinate system
    */
-  ares::dCs3& cs();
+  ares::dcs3& cs();
 
   /**
    * @brief Get camera coordinate system
    * @return Coordinate system
    */
-  const ares::dCs3& cs() const;
+  const ares::dcs3& cs() const;
 
   /**
    * @brief Get camera position
    * @return Position
    */
-  ares::dVec3& position();
+  ares::dvec3& position();
 
   /**
    * @brief Get camera position
    * @return Position
    */
-  const ares::dVec3& position() const;
+  const ares::dvec3& position() const;
 
   /**
    * @brief Move the camera by the provide vector
    * @param vec Vector to move by
    */
-  void translate(const ares::dVec3& vec);
+  void translate(const ares::dvec3& vec);
 
   /**
    * @brief Move the camera along the x axis by the provided step
@@ -95,45 +95,45 @@ struct Camera
    * @brief Rotate the camera to point at the specified 3D position
    * @param pos Position to point at
    */
-  void point_at(const ares::dVec3& pos);
+  void point_at(const ares::dvec3& pos);
 
   // Camera frustum
-  ares::Frustum frustum{.cs = ares::dCs3::make({}, {.z = -1}, {.y = 1})};
+  ares::Frustum frustum{.cs = ares::dcs3::make({}, {.z = -1}, {.y = 1})};
   // Window center position, used to point the camera in the right direction
-  ares::iVec2 center;
+  ares::ivec2 center;
 };
 
 
 
-inline ares::dCs3& Camera::cs()
+inline ares::dcs3& Camera::cs()
 {
   return frustum.cs;
 }
 
 
 
-inline const ares::dCs3& Camera::cs() const
+inline const ares::dcs3& Camera::cs() const
 {
   return frustum.cs;
 }
 
 
 
-inline ares::dVec3& Camera::position()
+inline ares::dvec3& Camera::position()
 {
   return frustum.cs.origin;
 }
 
 
 
-inline const ares::dVec3& Camera::position() const
+inline const ares::dvec3& Camera::position() const
 {
   return frustum.cs.origin;
 }
 
 
 
-inline void Camera::translate(const ares::dVec3& vec)
+inline void Camera::translate(const ares::dvec3& vec)
 {
   frustum.cs.origin += vec;
 }
@@ -197,7 +197,7 @@ inline void Camera::set_perspective(double fov, double aspect, double near_dist,
 
 
 
-inline void Camera::point_at(const ares::dVec3& pos)
+inline void Camera::point_at(const ares::dvec3& pos)
 {
   frustum.cs.set_x_axis((pos - frustum.cs.origin).make_normalized());
 }

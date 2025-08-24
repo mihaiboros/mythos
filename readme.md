@@ -9,6 +9,7 @@ For now it only works under Windows.
 
 Install VSCode and the CMake / C++ plugins to build and run the app.
 Or just run the cmake utility in the command line something like:
+
 ```sh
 cmake -B build -S .
 cmake --build build --config Release
@@ -18,11 +19,14 @@ cmake --build build --config Release
 
 - F1: switch between full screen and window mode
 - L: enable / disable light
-- B: enable / disable transparency
-- Page Down / Page Up / Arrows: move the camera
+- E/D: camera advance/retreat
+- S/F: camera strafe left/right
+- R/C: camera rise/descend
+- Q/W: camera roll left/right
+- mouse: camera pitch/yaw (only in full screen mode)
 
 ## Sub-projects
 
 - poc: contains the application code
-- hera: render engine library, when it grows up it may support multiple OSs (Win, MacOS) and graphic libraries (OpenGL, Metal)
-- ares: general utility library to support hera and poc
+- hera: render engine library, currenlty implemented with OpenGL and Windows API
+- ares: general support library

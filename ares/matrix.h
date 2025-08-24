@@ -11,17 +11,22 @@
 namespace ares
 {
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 struct Matrix;
 
-using dMatrix = Matrix<double>;
-using fMatrix = Matrix<float>;
+using dmatrix = Matrix<double>;
+using fmatrix = Matrix<float>;
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 struct Matrix
 {
+  /**
+   * @brief Make matrix from cs
+   * @param cs Coordinate system to use
+   * @return Matrix
+   */
+  static constexpr Matrix make_from(const Cs3<T>& cs);
+
   /**
    * @brief Indexer operator
    * @param index Index from which to get an element
@@ -120,8 +125,17 @@ struct Matrix
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
+constexpr Matrix<T> Matrix<T>::make_from(const Cs3<T>& cs)
+{
+  Matrix m;
+  m.set_from(cs);
+  return m;
+}
+
+
+
+template <arithmetic T>
 constexpr T& Matrix<T>::operator[](int index)
 {
   return data[index];
@@ -129,8 +143,7 @@ constexpr T& Matrix<T>::operator[](int index)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr const T& Matrix<T>::operator[](int index) const
 {
   return data[index];
@@ -138,8 +151,7 @@ constexpr const T& Matrix<T>::operator[](int index) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr Matrix<T> Matrix<T>::operator*(const Matrix& mx) const
 {
   Matrix res;
@@ -168,8 +180,7 @@ constexpr Matrix<T> Matrix<T>::operator*(const Matrix& mx) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr void Matrix<T>::operator*=(const Matrix& mx)
 {
   *this = *this * mx;
@@ -177,8 +188,7 @@ constexpr void Matrix<T>::operator*=(const Matrix& mx)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr Matrix<T> Matrix<T>::operator*(T value) const
 {
   Matrix res;
@@ -191,8 +201,7 @@ constexpr Matrix<T> Matrix<T>::operator*(T value) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr void Matrix<T>::operator*=(T value)
 {
   for (int i = 0; i < count; ++i)
@@ -203,8 +212,7 @@ constexpr void Matrix<T>::operator*=(T value)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr Matrix<T> Matrix<T>::operator/(T value) const
 {
   Matrix res;
@@ -217,8 +225,7 @@ constexpr Matrix<T> Matrix<T>::operator/(T value) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr void Matrix<T>::operator/=(T value)
 {
   for (int i = 0; i < count; ++i)
@@ -229,8 +236,7 @@ constexpr void Matrix<T>::operator/=(T value)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr Matrix<T> Matrix<T>::make_inverse() const
 {
   Matrix inv;
@@ -312,8 +318,7 @@ constexpr Matrix<T> Matrix<T>::make_inverse() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr void Matrix<T>::set_from(const Cs3<T>& cs)
 {
   data[0] = cs.x_axis.x;
@@ -339,8 +344,7 @@ constexpr void Matrix<T>::set_from(const Cs3<T>& cs)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr void Matrix<T>::set_identity()
 {
   std::ranges::copy({1, 0, 0, 0}, data);
@@ -367,8 +371,7 @@ constexpr void Matrix<T>::set_identity()
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool Matrix<T>::is_identity() const
 {
   return eq(1, data[0]) && eq(0, data[1]) && eq(0, data[2]) && eq(0, data[3])      // row 1
@@ -379,22 +382,22 @@ constexpr bool Matrix<T>::is_identity() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr Vec3<T> Matrix<T>::transform_v(const Vec3<T>& v) const
 {
-  return {.x = data[0] * v.x + data[4] * v.y + data[8] * v.z,
+  return {
+    .x = data[0] * v.x + data[4] * v.y + data[8] * v.z,
     .y = data[1] * v.x + data[5] * v.y + data[9] * v.z,
     .z = data[2] * v.x + data[6] * v.y + data[10] * v.z};
 }
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr Vec3<T> Matrix<T>::transform_p(const Vec3<T>& p) const
 {
-  return {.x = data[0] * p.x + data[4] * p.y + data[8] * p.z + data[12],
+  return {
+    .x = data[0] * p.x + data[4] * p.y + data[8] * p.z + data[12],
     .y = data[1] * p.x + data[5] * p.y + data[9] * p.z + data[13],
     .z = data[2] * p.x + data[6] * p.y + data[10] * p.z + data[14]};
 }

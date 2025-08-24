@@ -11,7 +11,7 @@ namespace hera
 struct Light
 {
   // light position
-  ares::fVec3 pos;
+  ares::fvec3 pos;
   // ambient light
   fColor ambient;
   // diffuse light

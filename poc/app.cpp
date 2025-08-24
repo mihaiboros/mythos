@@ -37,7 +37,7 @@ void App::execute_frame()
   if (!hera::engine.window.is_minimized)
   {
     _scene.handle_keys(_keys);
-    _scene.draw();
+    _scene.render();
     hera::engine.window.swap_buffers();
   }
 }

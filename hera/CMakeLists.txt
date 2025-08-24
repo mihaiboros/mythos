@@ -7,27 +7,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(
     SOURCE_FILES
+    blend.h
     camera.h
     color.h
     engine.cpp
     engine.h
     ext/stb_image.cpp
     ext/stb_image.h
+    glass_parts.h
     image.cpp
     image.h
     keymap.h
     light.h
-    model.h
-    opengl/enums.h
-    opengl/forge.cpp
-    opengl/forge.h
     opengl/heragl.h
     opengl/light_gl.h
-    opengl/model.cpp
     opengl/renderer.cpp
-    opengl/world.cpp
-    opengl/world.h
     renderer.h
+    solid_parts.h
+    texture.h
     vertex.h
     win/engine_os.cpp
     win/keymap.cpp

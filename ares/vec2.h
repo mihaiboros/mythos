@@ -9,12 +9,11 @@
 namespace ares
 {
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 struct Vec2;
 
-using dVec2 = Vec2<double>;
-using iVec2 = Vec2<int32_t>;
+using dvec2 = Vec2<double>;
+using ivec2 = Vec2<int32_t>;
 
 /**
  * @brief Multiplication operator
@@ -24,12 +23,10 @@ using iVec2 = Vec2<int32_t>;
  * @param v Vector to multiply
  * @return Result of operation
  */
-template <typename T, typename U>
-requires arithmetic<T>
+template <arithmetic T, typename U>
 constexpr Vec2<std::common_type_t<T, U>> operator*(T scalar, const Vec2<U>& v);
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 struct Vec2
 {
   /**
@@ -74,8 +71,7 @@ struct Vec2
    * @param scalar Scalar value
    * @return Result of operation
    */
-  template <typename U>
-  requires arithmetic<U>
+  template <arithmetic U>
   constexpr Vec2<std::common_type_t<T, U>> operator*(U scalar) const;
 
   /**
@@ -84,8 +80,7 @@ struct Vec2
    * @param scalar Scalar value
    * @return Result of operation
    */
-  template <typename U>
-  requires arithmetic<U>
+  template <arithmetic U>
   constexpr Vec2<std::common_type_t<T, U>> operator/(U scalar) const;
 
   /**
@@ -123,8 +118,7 @@ struct Vec2
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator+(const Vec2<U>& v) const
 {
@@ -133,8 +127,7 @@ constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator+(const Vec2<U>& v) co
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator-(const Vec2<U>& v) const
 {
@@ -143,8 +136,7 @@ constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator-(const Vec2<U>& v) co
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::common_type_t<T, U> Vec2<T>::operator*(const Vec2<U>& v) const
 {
@@ -153,8 +145,7 @@ constexpr std::common_type_t<T, U> Vec2<T>::operator*(const Vec2<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::common_type_t<T, U> Vec2<T>::dot(const Vec2<U>& v) const
 {
@@ -163,10 +154,8 @@ constexpr std::common_type_t<T, U> Vec2<T>::dot(const Vec2<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator*(U scalar) const
 {
   return {.x = x * scalar, .y = y * scalar};
@@ -174,10 +163,8 @@ constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator*(U scalar) const
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator/(U scalar) const
 {
   return {.x = x / scalar, .y = y / scalar};
@@ -185,8 +172,7 @@ constexpr Vec2<std::common_type_t<T, U>> Vec2<T>::operator/(U scalar) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool Vec2<T>::is_zero() const
 {
   return zero(x) && zero(y);
@@ -194,8 +180,7 @@ constexpr bool Vec2<T>::is_zero() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr double Vec2<T>::length() const
 {
   return std::sqrt(x * x + y * y);
@@ -203,8 +188,7 @@ constexpr double Vec2<T>::length() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec2<T>::normalize()
 {
@@ -217,8 +201,7 @@ constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec2<T>::normalize()
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec2<T>> Vec2<T>::make_normalized() const
 {

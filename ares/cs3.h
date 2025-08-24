@@ -7,18 +7,16 @@
 namespace ares
 {
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 struct Cs3;
 
-using dCs3 = Cs3<double>;
+using dcs3 = Cs3<double>;
 
 /**
  * @brief Right handed cartesian coordinate system
  * @tparam T Arythmetic type to use
  */
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 struct Cs3
 {
   /**
@@ -82,8 +80,7 @@ struct Cs3
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr Cs3<T> Cs3<T>::make(const Vec3<T>& origin, const Vec3<T>& x_axis, const Vec3<T>& y_axis)
 {
   return {.origin = origin, .x_axis = x_axis, .y_axis = y_axis, .z_axis = x_axis * y_axis};
@@ -91,8 +88,7 @@ constexpr Cs3<T> Cs3<T>::make(const Vec3<T>& origin, const Vec3<T>& x_axis, cons
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::set_x_axis(const Vec3<T>& x_axis)
 {
   if (x_axis.is_zero())
@@ -115,8 +111,7 @@ constexpr void Cs3<T>::set_x_axis(const Vec3<T>& x_axis)
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::compute_x()
 {
   x_axis = y_axis * z_axis;
@@ -124,8 +119,7 @@ constexpr void Cs3<T>::compute_x()
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::compute_y()
 {
   y_axis = z_axis * x_axis;
@@ -133,8 +127,7 @@ constexpr void Cs3<T>::compute_y()
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::compute_z()
 {
   z_axis = x_axis * y_axis;
@@ -142,8 +135,7 @@ constexpr void Cs3<T>::compute_z()
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::normalize()
 {
   x_axis.normalize();
@@ -153,8 +145,7 @@ constexpr void Cs3<T>::normalize()
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::rotate_by_x(double rad)
 {
   y_axis.rotate(x_axis, rad);
@@ -163,8 +154,7 @@ constexpr void Cs3<T>::rotate_by_x(double rad)
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::rotate_by_y(double rad)
 {
   z_axis.rotate(y_axis, rad);
@@ -173,8 +163,7 @@ constexpr void Cs3<T>::rotate_by_y(double rad)
 
 
 
-template <typename T>
-requires std::floating_point<T>
+template <std::floating_point T>
 constexpr void Cs3<T>::rotate_by_z(double rad)
 {
   x_axis.rotate(z_axis, rad);

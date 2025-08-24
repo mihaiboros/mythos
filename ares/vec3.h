@@ -10,13 +10,12 @@
 namespace ares
 {
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 struct Vec3;
 
-using dVec3 = Vec3<double>;
-using fVec3 = Vec3<float>;
-using iVec3 = Vec3<int32_t>;
+using dvec3 = Vec3<double>;
+using fvec3 = Vec3<float>;
+using ivec3 = Vec3<int32_t>;
 
 /**
  * @brief Multiplication operator
@@ -26,12 +25,10 @@ using iVec3 = Vec3<int32_t>;
  * @param v Vector to multiply
  * @return Result of operation
  */
-template <typename T, typename U>
-requires arithmetic<T>
+template <arithmetic T, typename U>
 constexpr Vec3<std::common_type_t<T, U>> operator*(T scalar, const Vec3<U>& v);
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 struct Vec3
 {
   /**
@@ -116,16 +113,14 @@ struct Vec3
    * @param scalar Scalar value
    * @return Result of operation
    */
-  template <typename U>
-  requires arithmetic<U>
+  template <arithmetic U>
   constexpr Vec3<std::common_type_t<T, U>> operator*(U scalar) const;
 
   /**
    * @brief Multiplication assignment operator
    * @param scalar Scalar value
    */
-  template <typename U>
-  requires arithmetic<U>
+  template <arithmetic U>
   constexpr void operator*=(U scalar);
 
   /**
@@ -134,16 +129,14 @@ struct Vec3
    * @param scalar Scalar value
    * @return Result of operation
    */
-  template <typename U>
-  requires arithmetic<U>
+  template <arithmetic U>
   constexpr Vec3<std::common_type_t<T, U>> operator/(U scalar) const;
 
   /**
    * @brief Division assignment operator
    * @param scalar Scalar value
    */
-  template <typename U>
-  requires arithmetic<U>
+  template <arithmetic U>
   constexpr void operator/=(U scalar);
 
   /**
@@ -151,8 +144,7 @@ struct Vec3
    * @tparam U Array type
    * @return std::array<U, 4> Coordinates array
    */
-  template <typename U = T>
-  requires arithmetic<U>
+  template <arithmetic U = T>
   std::array<U, 4> xyzw() const;
 
   /**
@@ -233,6 +225,15 @@ struct Vec3
   template <typename P0, typename P1, typename P2>
   constexpr bool is_coplanar(const Vec3<P0>& pt0, const Vec3<P1>& pt1, const Vec3<P2>& pt2) const;
 
+  /**
+   * @brief Compute distance between points
+   * @tparam P Type of other point
+   * @param pt Point to use
+   * @return Distance
+   */
+  template <typename P>
+  constexpr double distance_to(const Vec3<P>& pt) const;
+
   // value on x axis
   T x{0};
   // value on y axis
@@ -243,8 +244,7 @@ struct Vec3
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr bool Vec3<T>::operator==(const Vec3<U>& v) const
 {
@@ -253,8 +253,7 @@ constexpr bool Vec3<T>::operator==(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr bool Vec3<T>::operator!=(const Vec3<U>& v) const
 {
@@ -263,8 +262,7 @@ constexpr bool Vec3<T>::operator!=(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr bool Vec3<T>::operator<(const Vec3<U>& v) const
 {
@@ -273,8 +271,7 @@ constexpr bool Vec3<T>::operator<(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator+(const Vec3<U>& v) const
 {
@@ -283,8 +280,7 @@ constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator+(const Vec3<U>& v) co
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr void Vec3<T>::operator+=(const Vec3<U>& v)
 {
@@ -295,8 +291,7 @@ constexpr void Vec3<T>::operator+=(const Vec3<U>& v)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator-(const Vec3<U>& v) const
 {
@@ -305,8 +300,7 @@ constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator-(const Vec3<U>& v) co
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr void Vec3<T>::operator-=(const Vec3<U>& v)
 {
@@ -317,8 +311,7 @@ constexpr void Vec3<T>::operator-=(const Vec3<U>& v)
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator*(const Vec3<U>& v) const
 {
@@ -327,8 +320,7 @@ constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator*(const Vec3<U>& v) co
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::common_type_t<T, U> Vec3<T>::dot(const Vec3<U>& v) const
 {
@@ -337,10 +329,8 @@ constexpr std::common_type_t<T, U> Vec3<T>::dot(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator*(U scalar) const
 {
   return {.x = x * scalar, .y = y * scalar, .z = z * scalar};
@@ -348,10 +338,8 @@ constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator*(U scalar) const
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 constexpr void Vec3<T>::operator*=(U scalar)
 {
   x *= scalar;
@@ -361,10 +349,8 @@ constexpr void Vec3<T>::operator*=(U scalar)
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator/(U scalar) const
 {
   return {.x = x / scalar, .y = y / scalar, .z = z / scalar};
@@ -372,10 +358,8 @@ constexpr Vec3<std::common_type_t<T, U>> Vec3<T>::operator/(U scalar) const
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 constexpr void Vec3<T>::operator/=(U scalar)
 {
   x /= scalar;
@@ -385,10 +369,8 @@ constexpr void Vec3<T>::operator/=(U scalar)
 
 
 
-template <typename T>
-requires arithmetic<T>
-template <typename U>
-requires arithmetic<U>
+template <arithmetic T>
+template <arithmetic U>
 std::array<U, 4> Vec3<T>::xyzw() const
 {
   return {x, y, z, 1};
@@ -396,8 +378,7 @@ std::array<U, 4> Vec3<T>::xyzw() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr bool Vec3<T>::is_zero() const
 {
   return zero(x) && zero(y) && zero(z);
@@ -405,8 +386,7 @@ constexpr bool Vec3<T>::is_zero() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 constexpr double Vec3<T>::length() const
 {
   return std::sqrt(x * x + y * y + z * z);
@@ -414,8 +394,7 @@ constexpr double Vec3<T>::length() const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec3<T>::normalize()
 {
@@ -429,8 +408,7 @@ constexpr std::enable_if_t<std::is_floating_point_v<U>> Vec3<T>::normalize()
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> Vec3<T>::make_normalized() const
 {
@@ -440,11 +418,10 @@ constexpr std::enable_if_t<std::is_floating_point_v<U>, Vec3<T>> Vec3<T>::make_n
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U, typename V>
-constexpr std::enable_if_t<std::is_floating_point_v<V>> Vec3<T>::rotate(
-  const Vec3<U>& norm_ax, T rad)
+constexpr std::enable_if_t<std::is_floating_point_v<V>>
+Vec3<T>::rotate(const Vec3<U>& norm_ax, T rad)
 {
   const T cost = std::cos(rad);
   const T sint = std::sin(rad);
@@ -459,8 +436,7 @@ constexpr std::enable_if_t<std::is_floating_point_v<V>> Vec3<T>::rotate(
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr bool Vec3<T>::is_parallel(const Vec3<U>& v) const
 {
@@ -470,8 +446,7 @@ constexpr bool Vec3<T>::is_parallel(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr bool Vec3<T>::is_codir(const Vec3<U>& v) const
 {
@@ -481,8 +456,7 @@ constexpr bool Vec3<T>::is_codir(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename U>
 constexpr bool Vec3<T>::is_contradir(const Vec3<U>& v) const
 {
@@ -492,19 +466,26 @@ constexpr bool Vec3<T>::is_contradir(const Vec3<U>& v) const
 
 
 
-template <typename T>
-requires arithmetic<T>
+template <arithmetic T>
 template <typename P0, typename P1, typename P2>
-constexpr bool Vec3<T>::is_coplanar(
-  const Vec3<P0>& pt0, const Vec3<P1>& pt1, const Vec3<P2>& pt2) const
+constexpr bool
+Vec3<T>::is_coplanar(const Vec3<P0>& pt0, const Vec3<P1>& pt1, const Vec3<P2>& pt2) const
 {
   return eq((pt0 - *this).dot((pt1 - *this) * (pt2 - *this)), 0);
 }
 
 
 
-template <typename T, typename U>
-requires arithmetic<T>
+template <arithmetic T>
+template <typename P>
+constexpr double Vec3<T>::distance_to(const Vec3<P>& pt) const
+{
+  return (*this - pt).length();
+}
+
+
+
+template <arithmetic T, typename U>
 constexpr Vec3<std::common_type_t<T, U>> operator*(T scalar, const Vec3<U>& v)
 {
   return {.x = scalar * v.x, .y = scalar * v.y, .z = scalar * v.z};
