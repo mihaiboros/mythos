@@ -18,7 +18,7 @@ cmake --build build --config Release
 ## Keyboard interaction
 
 - F1: switch between full screen and window mode
-- L: enable / disable light
+- L: enable/disable light
 - E/D: camera advance/retreat
 - S/F: camera strafe left/right
 - R/C: camera rise/descend

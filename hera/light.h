@@ -16,6 +16,10 @@ struct Light
   fColor ambient;
   // diffuse light
   fColor diffuse;
+  // specular light
+  fColor specular;
+  // light id
+  int32_t id{0};
 };
 
 } // namespace hera

@@ -2,6 +2,7 @@
 
 #include "../glass_parts.h"
 #include "../image.h"
+#include "../light.h"
 #include "../solid_parts.h"
 #include "heragl.h"
 
@@ -50,6 +51,15 @@ Renderer::Renderer()
   _blend[Blend::Factor::One_minus_src_alpha] = GL_ONE_MINUS_SRC_ALPHA;
   _blend[Blend::Factor::Dst_alpha] = GL_DST_ALPHA;
   _blend[Blend::Factor::One_minus_dst_alpha] = GL_ONE_MINUS_DST_ALPHA;
+
+  _lights[0] = GL_LIGHT0;
+  _lights[1] = GL_LIGHT1;
+  _lights[2] = GL_LIGHT2;
+  _lights[3] = GL_LIGHT3;
+  _lights[4] = GL_LIGHT4;
+  _lights[5] = GL_LIGHT5;
+  _lights[6] = GL_LIGHT6;
+  _lights[7] = GL_LIGHT7;
 }
 
 
@@ -134,7 +144,7 @@ void Renderer::look_at(
 
 Texture Renderer::create_texture(const Image& img, Texture::Min min, Texture::Mag mag) const
 {
-  uint32_t tex = 0;
+  GLuint tex = 0;
   glGenTextures(1, &tex);
 
   glBindTexture(GL_TEXTURE_2D, tex);
@@ -188,6 +198,72 @@ void Renderer::render_parts(const Solid_parts& solids, const Glass_parts& glassy
   glDisable(GL_BLEND);
 }
 
+
+
+constexpr int32_t Renderer::max_lights() const
+{
+  return static_cast<int32_t>(_lights.max_size());
+}
+
+
+
+void Renderer::use_lighting(bool enable) const
+{
+  if (enable)
+  {
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+  }
+  else
+  {
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
+  }
+}
+
+
+
+bool Renderer::add_light(Light& light)
+{
+  if (0 == _light_count)
+  {
+    // set default material values for all lighting effects
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    const auto specular = fColor{.r = 1, .g = 1, .b = 1, .a = 1}.rgba();
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular.data());
+    const auto emission = fColor{.r = 0, .g = 0, .b = 0, .a = 1}.rgba();
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission.data());
+  }
+
+  const bool result = _light_count < max_lights();
+  _light_count += result;
+  light.id = _light_count - 1;
+
+  const auto ambient = light.ambient.rgba();
+  glLightfv(static_cast<GLenum>(_lights[light.id]), GL_AMBIENT, ambient.data());
+  const auto diffuse = light.diffuse.rgba();
+  glLightfv(static_cast<GLenum>(_lights[light.id]), GL_DIFFUSE, diffuse.data());
+  const auto specular = light.specular.rgba();
+  glLightfv(static_cast<GLenum>(_lights[light.id]), GL_SPECULAR, specular.data());
+  return result;
+}
+
+
+
+void Renderer::set_light(const Light& light) const
+{
+  const auto pos = light.pos.xyzw();
+  glLightfv(static_cast<GLenum>(_lights[light.id]), GL_POSITION, pos.data());
+  glEnable(static_cast<GLenum>(_lights[light.id]));
+}
+
+
+
+void Renderer::unset_light(const Light& light) const
+{
+  glDisable(static_cast<GLenum>(_lights[light.id]));
+}
+
 } // namespace hera
 
 namespace
@@ -204,8 +280,8 @@ void render_face(const P& part, const F& face, std::span<const hera::Vertex> ver
   glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(part.tex.id));
 
   // render face
-  glNormal3f(face.norm.x, face.norm.y, face.norm.z);
   glBegin(face.is_quad ? GL_QUADS : GL_TRIANGLES);
+  glNormal3f(face.norm.x, face.norm.y, face.norm.z);
   for (const auto& v : vertices)
   {
     glTexCoord2d(v.tex.x, v.tex.y);

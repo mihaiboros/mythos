@@ -20,7 +20,6 @@ set(
     keymap.h
     light.h
     opengl/heragl.h
-    opengl/light_gl.h
     opengl/renderer.cpp
     renderer.h
     solid_parts.h

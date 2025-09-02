@@ -13,6 +13,7 @@ namespace hera
 class Image;
 class Glass_parts;
 class Solid_parts;
+struct Light;
 
 class Renderer
 {
@@ -86,6 +87,37 @@ public:
    */
   void render_parts(const Solid_parts& solids, const Glass_parts& glassy);
 
+  /**
+   * @brief Get the max number of supported lights
+   * @return Max number of lights
+   */
+  constexpr int32_t max_lights() const;
+
+  /**
+   * @brief Use lighting model
+   * @param enable Enable/disable lighting model
+   */
+  void use_lighting(bool enable) const;
+
+  /**
+   * @brief Add a new light, upt to max lights after which overwrite last added light
+   * @param light Light to add, updated on return
+   * @return True if new light has been added, false if last light was overwritten
+   */
+  bool add_light(Light& light);
+
+  /**
+   * @brief Set the provided light
+   * @param light Light to set
+   */
+  void set_light(const Light& light) const;
+
+  /**
+   * @brief Unset the provided light
+   * @param light Light to unset
+   */
+  void unset_light(const Light& light) const;
+
   // enum used to access viewport attributes
   enum Vp
   {
@@ -94,6 +126,8 @@ public:
     width,     // width index in viewport array
     height     // height index in viewport array
   };
+
+private:
 
   // Viewport position and size (x, y, width, height)
   int32_t _viewport[4] = {0};
@@ -105,6 +139,10 @@ public:
   std::array<int32_t, 6> _filter;
   // blend enum
   std::array<int32_t, 5> _blend;
+  // lights enum
+  std::array<int32_t, 8> _lights;
+  // number of added lights
+  int32_t _light_count{0};
 };
 
 } // namespace hera

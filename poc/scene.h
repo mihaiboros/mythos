@@ -58,14 +58,8 @@ private:
   // object parts
   hera::Glass_parts _glassy;
   hera::Solid_parts _solids;
-  // has light flag
+  // light
   bool _has_light{false};
-  bool _lkey{false};
-  double _xr{0};
-  double _yr{0};
-  double _xs{0};
-  double _ys{0};
-  double _zp{-5};
   hera::Light _light;
   // World camera
   hera::Camera _camera;
