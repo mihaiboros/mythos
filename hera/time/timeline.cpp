@@ -23,6 +23,14 @@ void Timeline::start()
 
 
 
+void Timeline::resume()
+{
+  engine.scheduler.add(this);
+  _step = get_advance_step();
+}
+
+
+
 void Timeline::stop_step(int64_t usecs)
 {
   engine.scheduler.remove(this);

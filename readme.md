@@ -19,7 +19,8 @@ cmake --build build --config Release
 
 - F1: switch between full screen and window mode
 - L: enable/disable light
-- K: start animations
+- K: start/stop animations
+- J: reverse animations
 - E/D: camera advance/retreat
 - S/F: camera strafe left/right
 - R/C: camera rise/descend

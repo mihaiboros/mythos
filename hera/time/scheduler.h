@@ -60,14 +60,15 @@ inline void Scheduler::remove(Timeline* tl)
 {
   if (!_timelines.empty())
   {
-    const auto it = _index < static_cast<int64_t>(_timelines.size()) && _timelines[_index] == tl
+    const auto count = static_cast<int64_t>(_timelines.size());
+    const auto it = _index < count && _timelines[_index] == tl
                     ? _timelines.begin() + _index
                     : std::lower_bound(_timelines.begin(), _timelines.end(), tl);
-    if (it - _timelines.begin() <= _index && _index > 0)
+    if (it != _timelines.end() && *it == tl)
     {
-      --_index;
+      _index -= (0 < _index && _index >= it - _timelines.begin());
+      _timelines.erase(it);
     }
-    _timelines.erase(it);
   }
 }
 

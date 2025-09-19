@@ -16,9 +16,14 @@ public:
   virtual ~Timeline();
 
   /**
-   * @brief Start the timeline
+   * @brief Start the timeline from the beginning
    */
   void start();
+
+  /**
+   * @brief Resume the timeline from the last progression
+   */
+  void resume();
 
   /**
    * @brief Stop the timeline
@@ -44,22 +49,26 @@ public:
   int64_t total_elapsed() const;
 
   /**
-   * @brief Get timeline rate of advance (elapsed over duration)
-   * @return Timeline rate of advance
+   * @brief Get timeline progression (elapsed over duration)
+   * @return Timeline progression
    */
-  double advance_rate() const;
+  double progression() const;
 
 public:
 
   // Repeat timeline after duration is reached (loop)
   bool repeat{false};
+  // Progress the timeline in the forward direction
+  bool forward{true};
+  // Oscillate between start and end positions
+  bool oscillate{false};
   // Timeline duration in microseconds
   int64_t duration{0};
 
 protected:
 
   /**
-   * @brief Update total elapsed time based on duration when duration is passed
+   * @brief Set elapsed time as remainder of duration (call on overshoot if repeat)
    */
   void handle_overshoot();
 
@@ -83,12 +92,18 @@ private:
    */
   void stop_step(int64_t usecs);
 
+  /**
+   * @brief Get timeline direction
+   * @return 1 if forward, -1 if reversed
+   */
+  int32_t direction() const;
+
 private:
 
-  // advance step to execute
-  std::function<void(int64_t)> _step;
   // Elapsed microseconds since start of loop
   int64_t _elapsed{0};
+  // timeline step to execute
+  std::function<void(int64_t)> _step;
 };
 
 
@@ -102,7 +117,7 @@ inline void Timeline::stop()
 
 inline void Timeline::advance(int64_t usecs)
 {
-  _elapsed += usecs;
+  _elapsed += direction() * usecs;
   _step(usecs);
 }
 
@@ -131,7 +146,7 @@ inline int64_t Timeline::total_elapsed() const
 
 
 
-inline double Timeline::advance_rate() const
+inline double Timeline::progression() const
 {
   return double(_elapsed) / duration;
 }
@@ -140,7 +155,15 @@ inline double Timeline::advance_rate() const
 
 inline void Timeline::handle_overshoot()
 {
-  _elapsed = duration > 0 ? _elapsed % duration : 0;
+  forward = forward ^ oscillate;
+  _elapsed = 0 == duration ? 0 : forward ? _elapsed % duration : duration - _elapsed % duration;
+}
+
+
+
+inline int32_t Timeline::direction() const
+{
+  return 2 * forward - 1;
 }
 
 } // namespace hera

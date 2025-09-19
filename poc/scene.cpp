@@ -115,6 +115,7 @@ void Scene::load()
     std::make_unique<ares::Line>(
       ares::dvec3{.x = 1.5, .y = 0, .z = -9}, ares::dvec3{.x = 10, .y = 0, .z = -19}));
   _ani.repeat = true;
+  _ani.oscillate = true;
   _ani.duration = 1e7;
 }
 
@@ -174,7 +175,21 @@ void Scene::handle_keys(hera::Keymap& keys)
 
   if (keys.is_pressed(Key::K))
   {
-    _ani.start();
+    keys.release(Key::K);
+    if (_ani.is_running())
+    {
+      _ani.stop();
+    }
+    else
+    {
+      _ani.resume();
+    }
+  }
+
+  if (keys.is_pressed(Key::J))
+  {
+    keys.release(Key::J);
+    _ani.forward = !_ani.forward;
   }
 }
 

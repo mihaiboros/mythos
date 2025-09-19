@@ -101,14 +101,14 @@ inline const ares::dvec3& Animation::tangent() const
 
 inline void Animation::advance_step(int64_t usecs)
 {
-  if (total_elapsed() < duration)
+  if (0 < total_elapsed() && total_elapsed() < duration)
   {
-    _params = _path->params_at(advance_rate());
+    _params = _path->params_at(progression());
   }
   else if (repeat)
   {
     handle_overshoot();
-    _params = _path->params_at(advance_rate());
+    _params = _path->params_at(progression());
   }
   else
   {
