@@ -93,6 +93,12 @@ struct Matrix
   constexpr void set_from(const Cs3<T>& cs);
 
   /**
+   * @brief Set the provided point as origin as if the matrix is a coordinate system
+   * @param origin Origin to set
+   */
+  constexpr void set_origin(const Vec3<T>& origin);
+
+  /**
    * @brief Set the identity matrix
    */
   constexpr void set_identity();
@@ -339,6 +345,17 @@ constexpr void Matrix<T>::set_from(const Cs3<T>& cs)
   data[12] = cs.origin.x;
   data[13] = cs.origin.y;
   data[14] = cs.origin.z;
+  data[15] = 1;
+}
+
+
+
+template <arithmetic T>
+constexpr void Matrix<T>::set_origin(const Vec3<T>& origin)
+{
+  data[12] = origin.x;
+  data[13] = origin.y;
+  data[14] = origin.z;
   data[15] = 1;
 }
 

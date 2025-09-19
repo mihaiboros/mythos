@@ -24,6 +24,12 @@ set(
     renderer.h
     solid_parts.h
     texture.h
+    time/animation.h
+    time/scheduler.cpp
+    time/scheduler.h
+    time/timeline.cpp
+    time/timeline.h
+    time/timer.h
     vertex.h
     win/engine_os.cpp
     win/keymap.cpp

@@ -69,6 +69,13 @@ public:
     const Vertex& v2,
     const Vertex& v3);
 
+  /**
+   * @brief Get the part at the provided index
+   * @param index Index to use
+   * @return Requested part
+   */
+  Part& get_part(int index);
+
   // Part const iterator
   struct Citer;
 
@@ -125,6 +132,13 @@ inline void Solid_parts::add_face(
      .is_quad = true,
      .vbegin = static_cast<int32_t>(_vertices.size())});
   _vertices.insert(_vertices.end(), {v0, v1, v2, v3});
+}
+
+
+
+inline Solid_parts::Part& Solid_parts::get_part(int index)
+{
+  return _parts[index];
 }
 
 

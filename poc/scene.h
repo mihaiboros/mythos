@@ -7,7 +7,7 @@
 #include <hera/keymap.h>
 #include <hera/light.h>
 #include <hera/solid_parts.h>
-#include <memory>
+#include <hera/time/animation.h>
 
 namespace poc
 {
@@ -63,6 +63,8 @@ private:
   hera::Light _light;
   // World camera
   hera::Camera _camera;
+  // Animation
+  hera::Animation _ani;
 };
 
 } // namespace poc

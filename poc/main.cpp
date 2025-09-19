@@ -19,11 +19,11 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev_inst, LPSTR cmd_line, int cmd_
   }
 
   poc::App app(hera::engine.window.width, hera::engine.window.height);
-  hera::engine.on_key = [&app](uint8_t key, bool key_down) { app.set_key(key, key_down); };
+  hera::engine.on_key = [&app](uint8_t key, bool is_pressed) { app.set_key(key, is_pressed); };
   hera::engine.on_resize = [&app](int32_t width, int32_t height) { app.resize(width, height); };
 
   app.load();
-  while (hera::engine.peek_events_and_continue())
+  while (hera::engine.main_loop())
   {
     app.execute_frame();
   }

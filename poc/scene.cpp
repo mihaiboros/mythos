@@ -1,5 +1,6 @@
 #include "scene.h"
 
+#include <ares/line.h>
 #include <ares/matrix.h>
 #include <hera/camera.h>
 #include <hera/engine.h>
@@ -109,6 +110,12 @@ void Scene::load()
     .diffuse = {.r = 1, .g = 1, .b = 1, .a = 1},
     .specular = {.r = 0, .g = 0, .b = 0, .a = 1}};
   hera::engine.renderer.add_light(_light);
+
+  _ani.set_path(
+    std::make_unique<ares::Line>(
+      ares::dvec3{.x = 1.5, .y = 0, .z = -9}, ares::dvec3{.x = 10, .y = 0, .z = -19}));
+  _ani.repeat = true;
+  _ani.duration = 1e7;
 }
 
 
@@ -164,6 +171,11 @@ void Scene::handle_keys(hera::Keymap& keys)
   {
     _camera.roll(roll_speed);
   }
+
+  if (keys.is_pressed(Key::K))
+  {
+    _ani.start();
+  }
 }
 
 
@@ -183,6 +195,9 @@ void Scene::render()
   glVertex3d(0.5, 0.5, -13);
   glVertex3d(0.5, -0.5, -13);
   glEnd();
+
+  auto& part = _solids.get_part(1);
+  part.mat.set_origin(_ani.position());
 
   _glassy.sort_by_depth(_camera.cs().x_axis);
   hera::engine.renderer.render_parts(_solids, _glassy);

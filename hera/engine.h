@@ -1,8 +1,9 @@
-#ifndef __HERA_API_ENGINE_H__
-#define __HERA_API_ENGINE_H__
+#ifndef __HERA_ENGINE_H__
+#define __HERA_ENGINE_H__
 
 #include "camera.h"
 #include "renderer.h"
+#include "time/scheduler.h"
 #include "window.h"
 
 #include <functional>
@@ -34,6 +35,12 @@ public:
   bool create_window(const char* title, int32_t width, int32_t height, uint8_t bits);
 
   /**
+   * @brief Execute engine main loop
+   * @return False to exit
+   */
+  bool main_loop();
+
+  /**
    * @brief Point camera at the specified window coordinates
    * @param cam Camera to point
    * @param winx X window coordinate to be mapped
@@ -48,27 +55,23 @@ public:
   void set_camera(const Camera& cam);
 
   /**
-   * @brief Peek OS events and continue if no quit received
-   * @return false on quit, true to continue
-   */
-  bool peek_events_and_continue();
-
-  /**
    * @brief Show or hide the mouse cursor
    * @param show Flag to show or hide the cursor
    */
   void show_cursor(bool show) const;
 
-  // application window
-  Window window;
-  // renderer
-  Renderer renderer;
   // key event handler
-  std::function<void(uint8_t key_code, bool key_down)> on_key;
+  std::function<void(uint8_t key, bool is_pressed)> on_key;
   // resize event handler
   std::function<void(int32_t width, int32_t height)> on_resize;
   // mouse move event handler
   std::function<void(int32_t x, int32_t y)> on_mouse_move;
+  // application window
+  Window window;
+  // renderer
+  Renderer renderer;
+  // time scheduler
+  Scheduler scheduler;
 
 private:
 
@@ -84,6 +87,12 @@ private:
    */
   void set_cursor(int32_t x, int32_t y) const;
 
+  /**
+   * @brief Peek OS events and continue if no quit received
+   * @return false on quit, true to continue
+   */
+  bool peek_events_and_continue();
+
   // singleton engine instance
   inline static std::unique_ptr<Engine> _inst{std::make_unique<Engine>()};
   // mouse windows coordinates
@@ -97,6 +106,14 @@ static Engine& engine{Engine::instance()};
 inline Engine& Engine::instance()
 {
   return *_inst;
+}
+
+
+
+inline bool Engine::main_loop()
+{
+  scheduler.run();
+  return peek_events_and_continue();
 }
 
 
@@ -122,4 +139,4 @@ inline void Engine::set_camera(const Camera& cam)
 
 } // namespace hera
 
-#endif //__HERA_API_ENGINE_H__
+#endif //__HERA_ENGINE_H__

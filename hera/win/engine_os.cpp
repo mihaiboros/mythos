@@ -32,6 +32,20 @@ bool Engine::create_window(const char* title, int32_t width, int32_t height, uin
 
 
 
+void Engine::show_cursor(bool show) const
+{
+  ShowCursor(show);
+}
+
+
+
+void Engine::set_cursor(int x, int y) const
+{
+  SetCursorPos(x, y);
+}
+
+
+
 bool Engine::peek_events_and_continue()
 {
   if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -64,20 +78,6 @@ bool Engine::peek_events_and_continue()
     }
   }
   return true;
-}
-
-
-
-void Engine::show_cursor(bool show) const
-{
-  ShowCursor(show);
-}
-
-
-
-void Engine::set_cursor(int x, int y) const
-{
-  SetCursorPos(x, y);
 }
 
 } // namespace hera
