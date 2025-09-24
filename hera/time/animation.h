@@ -3,7 +3,8 @@
 
 #include "timeline.h"
 
-#include <ares/curve3d.h>
+#include <ares/curve/curve.h>
+#include <ares/curve/line3d.h>
 #include <memory>
 
 namespace hera
@@ -12,6 +13,12 @@ namespace hera
 class Animation : public Timeline
 {
 public:
+
+  /**
+   * @brief Set the speed curve
+   * @param speed Speed curve to set, may not be null
+   */
+  void set_speed(double (*speed)(double));
 
   /**
    * @brief Set the animation path
@@ -55,17 +62,21 @@ private:
 
 private:
 
-  // animation path
-  std::unique_ptr<ares::Curve3d> _path;
   // latest params on the curve
   ares::Curve3d::Params _params;
+  // animation speed
+  double (*_speed)(double){ares::Curve::linear};
+  // animation path
+  std::unique_ptr<ares::Curve3d> _path{
+    std::make_unique<ares::Line3d>(ares::dvec3{}, ares::dvec3{1, 1, 1})};
 };
 
 
 
-inline std::function<void(int64_t)> Animation::get_advance_step()
+inline void Animation::set_speed(double (*speed)(double))
 {
-  return [this](int64_t us) { this->advance_step(us); };
+  _speed = speed;
+  _params = _path->params_at(_speed(0));
 }
 
 
@@ -73,7 +84,7 @@ inline std::function<void(int64_t)> Animation::get_advance_step()
 inline void Animation::set_path(std::unique_ptr<ares::Curve3d> path)
 {
   _path = std::move(path);
-  _params = _path->params_at(0);
+  _params = _path->params_at(_speed(0));
 }
 
 
@@ -99,20 +110,27 @@ inline const ares::dvec3& Animation::tangent() const
 
 
 
+inline std::function<void(int64_t)> Animation::get_advance_step()
+{
+  return [this](int64_t us) { this->advance_step(us); };
+}
+
+
+
 inline void Animation::advance_step(int64_t usecs)
 {
-  if (0 < total_elapsed() && total_elapsed() < duration)
+  if (0 <= total_elapsed() && total_elapsed() <= duration)
   {
-    _params = _path->params_at(progression());
+    _params = _path->params_at(_speed(progression()));
   }
   else if (repeat)
   {
     handle_overshoot();
-    _params = _path->params_at(progression());
+    _params = _path->params_at(_speed(progression()));
   }
   else
   {
-    _params = _path->params_at(1);
+    _params = _path->params_at(_speed(1));
     stop();
   }
 }

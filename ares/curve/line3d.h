@@ -9,7 +9,7 @@ namespace ares
 /**
  * @brief Geometric 3D line
  */
-class Line : public Curve3d
+class Line3d : public Curve3d
 {
 public:
 
@@ -18,25 +18,25 @@ public:
    * @param start Line start
    * @param end Line end
    */
-  Line(const dvec3& start, const dvec3& end);
+  Line3d(const dvec3& start, const dvec3& end);
 
   /**
    * @brief Compute position at curve progress
-   * @param progress Progress to use
+   * @param progress Progress to use in [0, 1] interval
    * @return Position at progress
    */
   dvec3 position_at(double progress) const override;
 
   /**
    * @brief Compute tangent at curve progress
-   * @param progress Progress to use
+   * @param progress Progress to use in [0, 1] interval
    * @return Tangent at progress
    */
   dvec3 tangent_at(double progress) const override;
 
   /**
    * @brief Compute curve parameters at progress
-   * @param progress Progress to use
+   * @param progress Progress to use in [0, 1] interval
    * @return Curve parameters
    */
   Params params_at(double progress) const override;
@@ -49,7 +49,7 @@ private:
 
 
 
-inline Line::Line(const dvec3& start, const dvec3& end)
+inline Line3d::Line3d(const dvec3& start, const dvec3& end)
   : Curve3d(start, end)
   , _tan((end - start).make_normalized())
 {
@@ -57,21 +57,21 @@ inline Line::Line(const dvec3& start, const dvec3& end)
 
 
 
-inline dvec3 Line::position_at(double progress) const
+inline dvec3 Line3d::position_at(double progress) const
 {
   return _start + (_end - _start) * progress;
 }
 
 
 
-inline dvec3 Line::tangent_at(double progress) const
+inline dvec3 Line3d::tangent_at(double progress) const
 {
   return _tan;
 }
 
 
 
-inline Curve3d::Params Line::params_at(double progress) const
+inline Curve3d::Params Line3d::params_at(double progress) const
 {
   return {.position = position_at(progress), .tangent = _tan};
 }

@@ -31,7 +31,7 @@ public:
   void stop();
 
   /**
-   * @brief Advance timeline, called by scheduler after start
+   * @brief Advance timeline, called by scheduler after start/resume
    * @param usecs Elapsed microseconds since last call
    */
   void advance(int64_t usecs);
@@ -44,7 +44,7 @@ public:
 
   /**
    * @brief Get total elapsed microseconds since start of loop
-   * @return Total elpsed in microseconds
+   * @return Total elapsed microseconds
    */
   int64_t total_elapsed() const;
 
@@ -62,15 +62,22 @@ public:
   bool forward{true};
   // Oscillate between start and end positions
   bool oscillate{false};
-  // Timeline duration in microseconds
-  int64_t duration{0};
+  // Timeline duration in microseconds (must be greater than zero)
+  int64_t duration{1};
 
 protected:
 
   /**
-   * @brief Set elapsed time as remainder of duration (call on overshoot if repeat)
+   * @brief Call when elapsed time overshoots duration and timeline is repeatable.
+   * Computes direction and overshoot remainder
    */
   void handle_overshoot();
+
+  /**
+   * @brief Get timeline direction
+   * @return 1 if forward, -1 if reversed
+   */
+  int32_t direction() const;
 
   /**
    * @brief Get the timeline advance step
@@ -91,12 +98,6 @@ private:
    * @param usecs Elapsed microseconds since last call
    */
   void stop_step(int64_t usecs);
-
-  /**
-   * @brief Get timeline direction
-   * @return 1 if forward, -1 if reversed
-   */
-  int32_t direction() const;
 
 private:
 
@@ -126,6 +127,7 @@ inline void Timeline::advance(int64_t usecs)
 inline void Timeline::start_step(int64_t usecs)
 {
   _elapsed = 0;
+  duration = duration < 1 ? 1 : duration;
   _step = get_advance_step();
   _step(0);
 }
@@ -156,7 +158,7 @@ inline double Timeline::progression() const
 inline void Timeline::handle_overshoot()
 {
   forward = forward ^ oscillate;
-  _elapsed = 0 == duration ? 0 : forward ? _elapsed % duration : duration - _elapsed % duration;
+  _elapsed = duration * (1 - forward) + (1 - 2 * oscillate) * _elapsed % duration;
 }
 
 

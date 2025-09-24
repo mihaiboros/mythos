@@ -1,7 +1,7 @@
 #ifndef __ARES_CURVE3D_H__
 #define __ARES_CURVE3D_H__
 
-#include "vec3.h"
+#include "../vec3.h"
 
 namespace ares
 {
@@ -51,21 +51,21 @@ public:
 
   /**
    * @brief Compute position at curve progress
-   * @param progress Progress to use
+   * @param progress Progress to use in [0, 1] interval
    * @return Position at progress
    */
   virtual dvec3 position_at(double progress) const = 0;
 
   /**
    * @brief Compute tangent at curve progress
-   * @param progress Progress to use
+   * @param progress Progress to use in [0, 1] interval
    * @return Tangent at progress
    */
   virtual dvec3 tangent_at(double progress) const = 0;
 
   /**
    * @brief Compute curve parameters at progress
-   * @param progress Progress to use
+   * @param progress Progress to use in [0, 1] interval
    * @return Curve parameters
    */
   virtual Params params_at(double progress) const = 0;

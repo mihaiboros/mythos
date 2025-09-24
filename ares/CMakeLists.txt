@@ -10,10 +10,11 @@ set(
     bbox3.h
     concepts.h
     cs3.h
-    curve3d.h
+    curve/curve.h
+    curve/curve3d.h
+    curve/line3d.h
     epsilon.h
     frustum.h
-    line.h
     matrix.h
     plane.h
     vec2.h

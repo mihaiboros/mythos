@@ -1,6 +1,5 @@
 #include "scene.h"
 
-#include <ares/line.h>
 #include <ares/matrix.h>
 #include <hera/camera.h>
 #include <hera/engine.h>
@@ -111,12 +110,13 @@ void Scene::load()
     .specular = {.r = 0, .g = 0, .b = 0, .a = 1}};
   hera::engine.renderer.add_light(_light);
 
-  _ani.set_path(
-    std::make_unique<ares::Line>(
-      ares::dvec3{.x = 1.5, .y = 0, .z = -9}, ares::dvec3{.x = 10, .y = 0, .z = -19}));
+  const ares::dvec3 line_start{.x = 1.5, .y = 0, .z = -9};
+  const ares::dvec3 line_end{.x = 10, .y = 0, .z = -19};
+  _ani.set_path(std::make_unique<ares::Line3d>(line_start, line_end));
+  _ani.set_speed(ares::Curve::in_out_quad);
   _ani.repeat = true;
   _ani.oscillate = true;
-  _ani.duration = 1e7;
+  _ani.duration = 5e6;
 }
 
 
@@ -182,7 +182,7 @@ void Scene::handle_keys(hera::Keymap& keys)
     }
     else
     {
-      _ani.resume();
+      _ani.start();
     }
   }
 
